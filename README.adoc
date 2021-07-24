@@ -1,0 +1,5 @@
+= AWS Certification - Developer Associate 2021
+
+[.lead]
+*This course includes Quarkus v2.x, Apache Camel v3.x and Terraform v0.1x with all challenge details founded over the Course*
+
