@@ -104,6 +104,8 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+.terraform*
+.terraform
 
 # Secrets AWS
 *.pem
