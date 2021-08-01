@@ -52,7 +52,7 @@ resource "null_resource" "execute-native-api" {
       "sudo ./quarkus-camel-api &"
     ]
   }
-  
+
   depends_on = [aws_instance.t2-nano-inst]
 }
 

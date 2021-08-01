@@ -106,5 +106,7 @@ override.tf.json
 terraform.rc
 
 # Secrets AWS
-.secret
-.secret/**
+*.pem
+*.pub
+/.secret
+/.secret/**
