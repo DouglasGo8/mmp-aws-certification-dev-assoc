@@ -1,5 +1,62 @@
 = AWS Certification - Developer Associate 2021
 
 [.lead]
-*This course includes Quarkus v2.x, Apache Camel v3.x and Terraform v0.1x with all challenge details founded over the Course*
 
+*_This course includes Quarkus v2.x, Apache Camel Quarkus v2.x and Terraform v1.x with all challenge details
+founded over the Course_*
+
+IMPORTANT: *_Why we need Cloud?_*
+
+- Considering an Online Shop App, with peak load during a black friday, but you have less load out this time, this
+mean waste resources in idle loads, company bought infrastructure to wait that such load, and the company falls in
+1. Low infrastructure utilization
+2. Needs ahead of time planning
+3. High costs of procuring infrastructure
+4. Dedicated infrastructure maintenance team
+
+[.lead]
+
+- With the Cloud you buy (renting just needed Resources), and release it when not need them,
+On-demand resource provisioning offer low costs (pay per use)
+- No upfront planning needed
+- Avoiding "Undifferentiated heavy lifting"
+- AWS provides most of 200+ services
+
+== The main Links
+
+- https://aws.amazon.com/[AWS Cloud]
+- https://{{YOUR_IAM_ID}}.signin.aws.amazon.com/console[IAM User AWS Console]
+- https://camel.apache.org/[Apache Camel]
+- https://camel.apache.org/camel-quarkus/latest/[Apache Camel Extensions for Quarkus]
+- https://quarkus.io/[Quarkus]
+- https://code.quarkus.io/[Quarkus Coding]
+
+== IAM Section
+
+1. Root User -> IAM User in a group with permissions
+2. Never ever use Root User to create or manage resources
+3. As Root user type go to IAM console search and create a group and after the user, *_e.g. DevGroup_* and their
+policies -> *_e.g. DevUser_*, assign it to a  group, provides *_Programmatic access & AWS Management Console Access_*
+
+== Regions and Zones
+
+1. AWS provides multiple zones classified as regions (20+) that means multiple data centers spread around the world
+us-east-1 is the most common region used, in general choose that region based on your users and data are located,
+with regulatory and security compliance needs
+
+image::content/pic/RegionsAWS.png[]
+
+== EC2 Fundamentals
+
+* EC2 Elastic Computer Cloud, represents rented virtual servers, virtual machines billed by second
+* We can create and manage EC2 lifecycle of EC2 instances create load balancers and auto scaling groups, EC2 have
+ephemeral volumes, but we can attach permanent storages on them
+* Goal -> Set up a EC2 instance with IP Public call Quarkus/Camel Simple Api responding Hello World from my EC2 Host Name
+copy jars to this machine and access public the API, everything will be created using terraform,
+https://github.com/josefmayer/aws-ec2-java-terraform/blob/master/main.tf[AWS EC2 with api Jar]
+
+[source, bash]
+----
+ssh -i pem.file ubuntu@public_ip
+ps up $pid
+----
