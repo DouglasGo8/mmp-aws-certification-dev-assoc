@@ -96,6 +96,8 @@ image::content/pic/EC2_Metadata_Dynamic_Intance_identity_Document.png[]
 
 *** *Terraform Sample to EC2 AMZ AMI using httpd Web Server* the curl command bellow is not recommended here just to Test
 
+image::content/pic/View_Change_EC2_UserData.png[Change/View User Data on EC2 Instance]
+
 [source, hcl-terraform]
 ----
 resource "aws_instance" "aws-ec2-micro-instance" {
@@ -126,4 +128,21 @@ resource "aws_instance" "aws-ec2-micro-instance" {
 ** Two different corporate nets can have resources with same private IP address
 ** All EC2 instances are assigned with IP private address
 ** Public IP creation in EC2 can be enabled for EC2 instances in public subnet
-** When you stop an EC2 instance, public IP address is lost, Public IPs are ephemeral
+** When you *stop* an EC2 instance, public IP address will be lost, Public IPs are ephemeral, to keep the same ip we need to
+configure an elastic ip, but is not recommended practice
+** Elastic IP can be switched to another EC2 instance *within the same region*, *_must be detached manually_* otherwise it
+won't be released, you are billed when an EIP (Elastic IP) address *_IS NOT ASSOCIATED_* with any EC2 instance
+* Installing OS Patches and software using userdata at launch of EC2 instances *increase boot up* time with appropriated
+hardening image build
+* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template#capacity-reservation-specification[AWS EC2 launch Template demo]
+* AMis contains
+** Root volume block storage
+** Block device mapping for non-root volumes
+** Can configure and share own AMIs
+** AMIs are stores on S3
+** Always backup your AMIs
+** Below some Important scenarios to EC2
+
+image::content/pic/EC2_important_Scenarios_pt1.png[]
+
+image::content/pic/EC2_important_Scenarios_pt2.png[]
