@@ -193,9 +193,7 @@ resource "aws_route_table_association" "route-table-assoc-private-subnet-3" {
 resource "aws_security_group" "security-group-1" {
 
   vpc_id = aws_vpc.main.id
-
   name = "security-group-1"
-
   description = "Security Group for Public access by SSH"
 
   egress {
@@ -224,9 +222,7 @@ resource "aws_security_group" "security-group-1" {
 resource "aws_security_group" "security-group-2" {
 
   vpc_id = aws_vpc.main.id
-
   name = "security-group-2"
-
   description = "Security Group for Public access by Web"
 
   egress {

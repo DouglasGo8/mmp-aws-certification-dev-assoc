@@ -108,6 +108,7 @@ terraform.rc
 .terraform
 
 # Secrets AWS
+.secret
 *.pem
 *.pub
 /.secret

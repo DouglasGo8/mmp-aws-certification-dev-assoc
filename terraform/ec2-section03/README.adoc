@@ -1,0 +1,7 @@
+= RECIPE-01
+
+== Run a Camel-Quarkus Rest API over Native Mode on Terraform + EC2 Ubuntu Instance accessing via PUBLIC_IP
+
+* Goal -> Set up a EC2 instance with IP Public call Quarkus/Camel Simple Api responding Hello World from my EC2 Host Name
+copy jars to this machine and access public the API, everything will be created using terraform, over sa-east-1 region
+https://github.com/josefmayer/aws-ec2-java-terraform/blob/master/main.tf[AWS EC2 with api Jar]
