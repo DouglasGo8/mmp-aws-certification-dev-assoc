@@ -1,23 +1,27 @@
-variable "AWS_REGION" {
-  default = "sa-east-1"
+variable "CIDR" {}
+variable "AWS_REGION" {}
+variable "AWS_PROFILE" {}
+variable "AWS_AVAILABILITY_ZONES" {}
+variable "AWS_PROJECT_NAME" {
+  description = "the name of your stack, e.g. \"demo\""
+}
+variable "AWS_ENVIRONMENT" {
+  description = "the name of your environment, e.g. \"prod\""
+  default     = "dev"
 }
 
-variable "AWS_PROFILE" {
-  default = "default"
+variable "AWS_PRIVATE_SUBNETS" {
+  description = "a list of CIDRs for private subnets in your VPC, must be set if the cidr variable is defined, needs to have as many elements as there are availability zones"
+  default = [
+    "10.0.0.0/20",
+    "10.0.32.0/20",
+    "10.0.64.0/20"]
 }
 
-# Project wide variable
-variable "PROJECT_NAME" {}
-
-# VPC Variables
-variable "VPC_CIDR_BLOCK" {}
-
-# Public
-variable "VPC_PUBLIC_SUBNET1_CIDR_BLOCK" {}
-variable "VPC_PUBLIC_SUBNET2_CIDR_BLOCK" {}
-variable "VPC_PUBLIC_SUBNET3_CIDR_BLOCK" {}
-
-# Private
-variable "VPC_PRIVATE_SUBNET1_CIDR_BLOCK" {}
-variable "VPC_PRIVATE_SUBNET2_CIDR_BLOCK" {}
-variable "VPC_PRIVATE_SUBNET3_CIDR_BLOCK" {}
+variable "AWS_PUBLIC_SUBNETS" {
+  description = "a list of CIDRs for public subnets in your VPC, must be set if the cidr variable is defined, needs to have as many elements as there are availability zones"
+  default = [
+    "10.0.16.0/20",
+    "10.0.48.0/20",
+    "10.0.80.0/20"]
+}

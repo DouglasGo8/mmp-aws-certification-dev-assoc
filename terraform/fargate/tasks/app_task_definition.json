@@ -1,0 +1,30 @@
+[
+  {
+    "name": "${container_name}",
+    "image": "${container_image}",
+    "portMappings": [
+      {
+        "protocol": "tcp",
+        "containerPort": "${container_port}",
+        "hostPort": "${container_port}"
+      }
+    ],
+    "essential": true,
+    "memory": "${container_memory}",
+    "networkMode": "awsvpc",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/fargate/service/${var.AWS_PROJECT_NAME}-${var.AWS_ENVIRONMENT}",
+        "awslogs-region": "${aws_region}",
+        "awslogs-stream-prefix": "ecs"
+      }
+    },
+    "environment": [
+      {
+        "name": "AWS_HOST",
+        "value": "${aws_db_host}"
+      }
+    ]
+  }
+]

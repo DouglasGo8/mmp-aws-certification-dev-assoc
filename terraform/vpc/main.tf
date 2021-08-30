@@ -1,246 +1,136 @@
-terraform {
-  required_version = "~> 1.0.3"
-}
-
-resource "aws_vpc" "main" {
-  cidr_block           = var.VPC_CIDR_BLOCK
-  instance_tenancy     = "default"
-  enable_dns_support   = true
+resource "aws_vpc" "main-vpc" {
+  cidr_block = var.CIDR
+  enable_dns_support = true
   enable_dns_hostnames = true
-  enable_classiclink   = false
+
   tags = {
-    Name = "${var.PROJECT_NAME}"
+    Name = "${var.AWS_PROJECT_NAME}-vpc-${var.AWS_ENVIRONMENT}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
 
-#################
-# Public Subnets
-#################
-
-resource "aws_subnet" "public-subnet-1" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = var.VPC_PUBLIC_SUBNET1_CIDR_BLOCK
-  # AWS Resource Search
-  availability_zone       = data.aws_availability_zones.available.names[0]
-  map_public_ip_on_launch = true
+# Internet Gateway must be associated with route table and public subnets (RDS with Publicily Access needs this)
+resource "aws_internet_gateway" "main-igw" {
+  vpc_id = aws_vpc.main-vpc.id
   tags = {
-    Name = "${var.PROJECT_NAME}-vpc-public-subnet-1"
+    Name = "${var.AWS_PROJECT_NAME}-igw-${var.AWS_ENVIRONMENT}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
 
-resource "aws_subnet" "public-subnet-2" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.VPC_PUBLIC_SUBNET2_CIDR_BLOCK
-  availability_zone       = data.aws_availability_zones.available.names[1]
-  map_public_ip_on_launch = true
+resource "aws_eip" "nat-eip" {
+  count = length(var.AWS_PRIVATE_SUBNETS)
+  vpc = true
+
   tags = {
-    Name = "${var.PROJECT_NAME}-vpc-public-subnet-2"
+    Name = "${var.AWS_PROJECT_NAME}-eip-${var.AWS_ENVIRONMENT}-${format("%03d", count.index+1)}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
 
-resource "aws_subnet" "public-subnet-3" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.VPC_PUBLIC_SUBNET3_CIDR_BLOCK
-  availability_zone       = data.aws_availability_zones.available.names[2]
-  map_public_ip_on_launch = true
+# Nat gateways must to refer internet gateway and public subnets
+resource "aws_nat_gateway" "main-ngw" {
+  count = length(var.AWS_PRIVATE_SUBNETS)
+  allocation_id = element(aws_eip.nat-eip.*.id, count.index)
+  subnet_id = element(aws_subnet.subnet-public.*.id, count.index)
+  depends_on = [aws_internet_gateway.main-igw]
+
   tags = {
-    Name = "${var.PROJECT_NAME}-vpc-public-subnet-3"
+    Name = "${var.AWS_PROJECT_NAME}-nat-${var.AWS_ENVIRONMENT}-${format("%03d", count.index+1)}"
+    Environment = var.AWS_ENVIRONMENT
+  }
+
+}
+
+resource "aws_subnet" "subnet-private" {
+  vpc_id = aws_vpc.main-vpc.id
+  cidr_block = element(var.AWS_PRIVATE_SUBNETS, count.index)
+  availability_zone = element(var.AWS_AVAILABILITY_ZONES, count.index)
+  count = length(var.AWS_PRIVATE_SUBNETS)
+
+  tags = {
+    Name = "${var.AWS_PROJECT_NAME}-private-subnet-${var.AWS_ENVIRONMENT}-${format("%03d", count.index+1)}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
 
-###################
-# Private Subnets
-###################
+resource "aws_subnet" "subnet-public" {
+  vpc_id = aws_vpc.main-vpc.id
+  cidr_block = element(var.AWS_PUBLIC_SUBNETS, count.index)
+  availability_zone = element(var.AWS_AVAILABILITY_ZONES, count.index)
+  count = length(var.AWS_PUBLIC_SUBNETS)
 
-resource "aws_subnet" "private-subnet-1" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.VPC_PRIVATE_SUBNET1_CIDR_BLOCK
-  availability_zone       = data.aws_availability_zones.available.names[0]
-  map_public_ip_on_launch = false
   tags = {
-    Name = "${var.PROJECT_NAME}-vpc-private-subnet-1"
+    Name = "${var.AWS_PROJECT_NAME}-public-subnet-${var.AWS_ENVIRONMENT}-${format("%03d", count.index+1)}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
-
-resource "aws_subnet" "private-subnet-2" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.VPC_PRIVATE_SUBNET2_CIDR_BLOCK
-  availability_zone       = data.aws_availability_zones.available.names[1]
-  map_public_ip_on_launch = false
-  tags = {
-    Name = "${var.PROJECT_NAME}-vpc-private-subnet-2"
-  }
-}
-
-resource "aws_subnet" "private-subnet-3" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.VPC_PRIVATE_SUBNET3_CIDR_BLOCK
-  availability_zone       = data.aws_availability_zones.available.names[2]
-  map_public_ip_on_launch = false
-  tags = {
-    Name = "${var.PROJECT_NAME}-vpc-private-subnet-3"
-  }
-}
-
-###################
-# Internet Gateway
-###################
-
-resource "aws_internet_gateway" "internet-gateway-1" {
-  vpc_id = aws_vpc.main.id
-  tags = {
-    Name = "${var.PROJECT_NAME}-vpc-internet-gateway"
-  }
-}
-
-######################################################
-# Elastic IP for Nat Gateway ** Spensive Resource ** #
-######################################################
-
-resource "aws_eip" "nat_eip" {
-  vpc        = true
-  depends_on = [aws_internet_gateway.internet-gateway-1]
-  tags = {
-    Name = "${var.PROJECT_NAME}-vpc-nat-elastic-ip"
-  }
-}
-
-resource "aws_nat_gateway" "nat-gateway-1" {
-  allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.public-subnet-1.id
-  depends_on    = [aws_internet_gateway.internet-gateway-1]
-  tags = {
-    Name = "${var.PROJECT_NAME}-vpc-nat-gateway"
-  }
-}
-
-
-#################################
-# Route Table for Public Subnets  
-#################################
 
 resource "aws_route_table" "route-table-public" {
-  vpc_id = aws_vpc.main.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.internet-gateway-1.id
-  }
-
+  vpc_id = aws_vpc.main-vpc.id
   tags = {
-    Name = "${var.PROJECT_NAME}-public-route-table"
+    Name = "${var.AWS_PROJECT_NAME}-routing-table-public"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
 
-##################################
-# Route Table for Private Subnets  
-##################################
+resource "aws_route" "route-public" {
+  route_table_id = aws_route_table.route-table-public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.main-igw.id
+}
 
 resource "aws_route_table" "route-table-private" {
-  vpc_id = aws_vpc.main.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat-gateway-1.id
-  }
+  count = length(var.AWS_PRIVATE_SUBNETS)
+  vpc_id = aws_vpc.main-vpc.id
 
   tags = {
-    Name = "${var.PROJECT_NAME}-private-route-table"
+    Name = "${var.AWS_PROJECT_NAME}-routing-table-private-${format("%03d", count.index+1)}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
 
+resource "aws_route" "route-private" {
+  count = length(compact(var.AWS_PRIVATE_SUBNETS))
+  route_table_id = element(aws_route_table.route-table-private.*.id, count.index)
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id = element(aws_nat_gateway.main-ngw.*.id, count.index)
+}
 
-##############################################
-# Route Table association with public subnets  
-##############################################
+resource "aws_route_table_association" "private" {
+  count = length(var.AWS_PRIVATE_SUBNETS)
+  subnet_id = element(aws_subnet.subnet-private.*.id, count.index)
+  route_table_id = element(aws_route_table.route-table-private.*.id, count.index)
+}
 
-resource "aws_route_table_association" "route-table-assoc-public-subnet-1" {
-  subnet_id      = aws_subnet.public-subnet-1.id
+resource "aws_route_table_association" "public" {
+  count = length(var.AWS_PUBLIC_SUBNETS)
+  subnet_id = element(aws_subnet.subnet-public.*.id, count.index)
   route_table_id = aws_route_table.route-table-public.id
 }
 
-resource "aws_route_table_association" "route-table-assoc-public-subnet-2" {
-  subnet_id      = aws_subnet.public-subnet-2.id
-  route_table_id = aws_route_table.route-table-public.id
-}
-
-resource "aws_route_table_association" "route-table-assoc-public-subnet-3" {
-  subnet_id      = aws_subnet.public-subnet-3.id
-  route_table_id = aws_route_table.route-table-public.id
-}
-
-##############################################
-# Route Table association with private subnets  
-##############################################
-
-resource "aws_route_table_association" "route-table-assoc-private-subnet-1" {
-  subnet_id      = aws_subnet.private-subnet-1.id
-  route_table_id = aws_route_table.route-table-private.id
-}
-
-resource "aws_route_table_association" "route-table-assoc-private-subnet-2" {
-  subnet_id      = aws_subnet.private-subnet-2.id
-  route_table_id = aws_route_table.route-table-private.id
-}
-
-resource "aws_route_table_association" "route-table-assoc-private-subnet-3" {
-  subnet_id      = aws_subnet.private-subnet-3.id
-  route_table_id = aws_route_table.route-table-private.id
-}
-
-#########################################
-# Security Group to allow SSH Connection
-#########################################
-
-resource "aws_security_group" "security-group-1" {
-
-  vpc_id = aws_vpc.main.id
-  name = "security-group-1"
-  description = "Security Group for Public access by SSH"
+# SSH Security Group
+resource "aws_security_group" "sg-ssh" {
+  name = "${var.AWS_PROJECT_NAME}-sg-alb-${var.AWS_ENVIRONMENT}"
+  vpc_id = aws_vpc.main-vpc.id
+  ingress {
+    protocol = "tcp"
+    from_port = 22
+    to_port = 22
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    protocol = "-1"
+    from_port = 0
+    to_port = 0
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   tags = {
-    Name = "security-group-1"
+    Name = "${var.AWS_PROJECT_NAME}-sg-alb-${var.AWS_ENVIRONMENT}"
+    Environment = var.AWS_ENVIRONMENT
   }
 }
-
-#########################################
-# Security Group to allow Web Connection
-#########################################
-
-resource "aws_security_group" "security-group-2" {
-
-  vpc_id = aws_vpc.main.id
-  name = "security-group-2"
-  description = "Security Group for Public access by Web"
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "security-group-2"
-  }
-}
-
