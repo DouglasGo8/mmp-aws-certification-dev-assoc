@@ -1,37 +1,30 @@
 package com.udemy.aws.cert.dev.assoc.fargate.adapter.in.web;
 
-import lombok.NoArgsConstructor;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.rest.RestBindingMode;
+import com.udemy.aws.cert.dev.assoc.fargate.domain.StackTech;
+import org.apache.camel.ProducerTemplate;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * @author dougdb
  */
-@NoArgsConstructor
-@ApplicationScoped
-public class WelcomeResource extends RouteBuilder {
-  @Override
-  public void configure() {
 
-    final String portNumber = "8080";
+@Path("/api/aws/")
+public class StackTechResource {
 
-    restConfiguration()
-            // ----------------------------------------------
-            .port(portNumber)
-            .host("0.0.0.0")
-            .component("netty-http")
-            .bindingMode(RestBindingMode.json)
-            .dataFormatProperty("prettyPrint", "true")
-            // ----------------------------------------------
-            .apiVendorExtension(true)
-            .apiProperty("cors", "true")
-            .apiProperty("api.title", "User API")
-            .apiProperty("api.version", "1.0.0");
+  @Inject
+  ProducerTemplate template;
 
-
-    rest("/api/aws/greeting").id("WelcomeResourceRouteId").get("/{name}")
-            .to("{{direct.welcome.mediation.endpoint}}");
+  @GET
+  @Path("/stack/{name}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response sayHello(@PathParam final String name) {
+    return Response.ok(template.requestBody("{{direct.stacktech.mediation.endpoint}}", name, StackTech.class)).build();
   }
 }

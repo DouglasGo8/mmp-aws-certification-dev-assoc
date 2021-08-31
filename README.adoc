@@ -16,6 +16,48 @@ mean waste resources in idle loads, company bought infrastructure to wait that s
 3. High costs of procuring infrastructure
 4. Dedicated infrastructure maintenance team
 
+
+[.lead]
+== AWS Secret Generation
+[source,bash]
+----
+ssh-keygen -f {{PEM_FILE}}.pem
+sudo ssh-keygen -e -m RFC4716 -f {{PEM_FILE}}.pem
+sudo chmod 600 /path/{{PEM_FILE}}.pem
+sudo chmod 755 /path_of_pems
+ssh -i {{pem}} ec2-user@{{PUBLIC_IP}}
+ssh -i {{pem}} ubuntu@{{PUBLIC_IP}}
+----
+
+[.lead]
+== AWS ECR Quarkus push image using temp token in config
+
+[source,bash]
+----
+mvn clean -DskipTests package -Pnative -Dquarkus.native.container-build=true
+docker build -f src/main/docker/Dockerfile.native -t myapp .
+aws ecr get-login-password --region sa-east-1
+aws ecr get-login-password \
+  --region sa-east-1 | docker login --username AWS --password-stdin \
+  501317491826.dkr.ecr.sa-east-1.amazonaws.com
+docker tag myapp 501317491826.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo:myapp
+
+# docker run --rm --name myapp -p 8080:8080 myapp # only local test purpose - must be remove after test
+docker push 501317491826.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo:myapp
+----
+== AWS ECR Login output
+
+* The ##*_aws ecr get-login.._*## up command will genenerate the following message
+[source, html]
+----
+WARNING! Your password will be stored unencrypted in {{YOUR_PATH}}/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+----
+
 [.lead]
 
 - With the Cloud you buy (renting just needed Resources), and release it when not need them,
@@ -33,7 +75,7 @@ On-demand resource provisioning offer low costs (pay per use)
 - https://quarkus.io/[Quarkus]
 - https://code.quarkus.io/[Quarkus Coding]
 - https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/#links[Asciidoctor Docs]
-
+- https://www.pgadmin.org/download/pgadmin-4-apt/[pgAdmin4 APT]
 == IAM Section
 
 1. Root User -> IAM User in a group with permissions
@@ -146,3 +188,73 @@ hardening image build
 image::content/pic/EC2_important_Scenarios_pt1.png[]
 
 image::content/pic/EC2_important_Scenarios_pt2.png[]
+
+== AWS Elastic Load Balancing
+
+* Is a High Available *Managed* AWS service that enables distributed traffic among ec2 instances in one or more AZs in a single region
+* Auto scales to handle huge loads, it can be *PUBLIC* or *PRIVATE*
+* Health checks to check route traffic to healthy instances
+
+Classifing Transport Layers::
+
+ Network Layer:::
+   . IP (Internet Protocol) - Transfer Bytes, unreliable
+ Transport Layers:::
+   . TCP (Transmission Control) - Reliability > Performance
+   . TLS (Transport Layer Security) - Secure TCP
+   . UDP (User Datagram Protocol) - Performance > Reliability
+ Application Layer:::
+   . HTTP (Hypertext transfer protocol) - Stateless Request/Response Cycle
+   . HTTPs: Secure HTTP
+
+====
+----
+Application Layer (Layer 7) - HTTP/HTTPS/SMTP
+Most apps use this layer - Web Apps/REST API(HTTP/HTTPS), Email Servers(SMTP), File Transfers(FTP)
+All these apps use TCP/TLS at network layer (for reliability)
+----
+----
+Transport Layer (Layer 4) - TCP TLS UDP
+Apps that needing high performance *directly* communicate at transport layer, gamming apps/live video streaming use UDP
+----
+----
+Network Layer (Layer 3) - IP
+----
+====
+
+> Three type of AWS ELB
+>
+> > *Classic Load Balancer* (Layer 4 and Layer 7) **deprecated** note recomended by AWS
+>
+> > *Application Load Balancer* (Layer 7) - new generation to supporting HTTP/HTTPS and advanced routing approaches
+>
+> > *Network Load Balancer* (Layer 4) - New generation supporting TCP/TLS and UDP
+
+* Application Load Balance
+
+** Most Popular and frequently used ELB in AWS, support WebSockets and HTTP/HTTPs over Layer 7, with support all import lb feat, and *automatically* scaling
+based on demand
+** Can load balance between
+  . EC2 Instances
+  . Containerized apps (Amazon ECS)
+  . Web apps (using IP address)
+  . Lambda can be used too, but is no used frequentely most common approach in lambda is API Gateway
+** Target Groups
+  . We can group instances to alb have distributed the load, can be a set of EC2 instances, lambda function or a set of ip address
+** Stickyness is a feat to send all request from one user to the same instance is implemented by using a cookie
+
+
+
+
+Section Challenge
+
+Quarkus,Camel/Fargate/ECR/ALB/Terraform
+
+All resources in terraform were did merge with the links down bellow
+
+https://gmusumeci.medium.com/how-to-deploy-aws-ecs-fargate-containers-step-by-step-using-terraform-545eeac743be
+https://github.com/duduribeiro/terraform_ecs_fargate_example
+https://engineering.finleap.com/posts/2020-02-20-ecs-fargate-terraform/
+https://github.com/turnerlabs/terraform-ecs-fargate/tree/master/env/dev
+
+push to 501317491826.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo

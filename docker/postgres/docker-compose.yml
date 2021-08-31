@@ -1,0 +1,54 @@
+version: '3.5'
+services:
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: quarkusdb
+      POSTGRES_USER: guest
+      POSTGRES_PASSWORD: welcome1
+      PG_DATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    networks:
+      - postgres_net
+    ports:
+      - "5432:5432"
+
+#  pgadmin4:
+#    image: dpage/pgadmin4:latest
+#    container_name: pgadmin4
+#    restart: unless-stopped
+#    links:
+#      - postgres
+#    depends_on:
+#      - postgres
+#    networks:
+#      - postgres_net
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: guest@mail.com
+#      PGADMIN_DEFAULT_PASSWORD: welcome1
+#    ports:
+#      - "11899:80"
+
+#### Only Test purpose
+#  myapp:
+#    image: myapp:latest
+#    container_name: myapp
+#    networks:
+#      - postgres_net
+#    depends_on:
+#      - postgres
+#    environment:
+#      AWS_HOST: postgres
+#    ports:
+#      - "8080:80"
+
+networks:
+  postgres_net:
+
+volumes:
+  postgres:
+

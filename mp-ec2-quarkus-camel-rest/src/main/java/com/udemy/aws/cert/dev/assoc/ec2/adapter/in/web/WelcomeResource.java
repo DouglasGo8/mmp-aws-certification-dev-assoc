@@ -1,6 +1,7 @@
 package com.udemy.aws.cert.dev.assoc.ec2.adapter.in.web;
 
 
+import lombok.NoArgsConstructor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 
@@ -9,6 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 /**
  * @author dougdb
  */
+@NoArgsConstructor
 @ApplicationScoped
 public class WelcomeResource extends RouteBuilder {
   @Override

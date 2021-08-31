@@ -12,7 +12,7 @@
   </parent>
 
   <groupId>com.udemy.aws.cert.dev.assoc.ec2</groupId>
-  <artifactId>mp-module03-ec2-quarkus-camel-rest</artifactId>
+  <artifactId>mp-ec2-quarkus-camel-rest</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
   <name>AWS :: Developer Associate Certification 2021 :: Quarkus/Camel Rest API on EC2</name>

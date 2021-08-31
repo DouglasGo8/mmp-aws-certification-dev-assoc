@@ -5,14 +5,13 @@ import org.apache.camel.builder.RouteBuilder;
 /**
  * @author dougdb
  */
-public class WelcomeMediation extends RouteBuilder {
+public class StackTechMediation extends RouteBuilder {
 
   @Override
-  public void configure() throws Exception {
+  public void configure() {
 
-    from("{{direct.welcome.mediation.endpoint}}").id("WelcomeMediaRouteId")
-            
-            //.log("${body}")
+    from("{{direct.stacktech.mediation.endpoint}}").id("StackTechMediationRouteId")
+            .to("bean:stackGreeting")
             .end();
   }
 }
