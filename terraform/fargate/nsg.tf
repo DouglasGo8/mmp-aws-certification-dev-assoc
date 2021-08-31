@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "sg_task_ingress_rule" {
   type        = "ingress"
   from_port   = "0"
   to_port     = "0"
-  protocol    = "http"
+  protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
 
   source_security_group_id = aws_security_group.lb-nsg.id
