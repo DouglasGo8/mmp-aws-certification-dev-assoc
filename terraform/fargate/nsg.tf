@@ -22,6 +22,7 @@ resource "aws_security_group" "lb-nsg" {
 }
 
 # RULES
+# Must be checkec with security in prod environments
 
 resource "aws_security_group_rule" "sg_task_ingress_rule" {
   description = "Only allow connections from SG ${var.AWS_PROJECT_NAME}-${var.AWS_ENVIRONMENT}-lb on port ${var.AWS_CONTAINER_PORT_NUMBER}"

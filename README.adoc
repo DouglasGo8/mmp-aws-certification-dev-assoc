@@ -224,37 +224,75 @@ Network Layer (Layer 3) - IP
 
 > Three type of AWS ELB
 >
-> > *Classic Load Balancer* (Layer 4 and Layer 7) **deprecated** note recomended by AWS
+> > *Classic Load Balancer* (Layer 4 and Layer 7) **deprecated** note recomended by AWS, with support TCP, SSL/TLS and HTTP/HTTP(S) over Layer 4/7
 >
 > > *Application Load Balancer* (Layer 7) - new generation to supporting HTTP/HTTPS and advanced routing approaches
 >
 > > *Network Load Balancer* (Layer 4) - New generation supporting TCP/TLS and UDP
 
-* Application Load Balance
+* Application Load Balancer
 
-** Most Popular and frequently used ELB in AWS, support WebSockets and HTTP/HTTPs over Layer 7, with support all import lb feat, and *automatically* scaling
+** Most Popular and frequently used ELB in AWS, support WebSockets and HTTP/HTTPs over Layer 7, with support all import lb feat, and *automatically* scales
 based on demand
 ** Can load balance between
   . EC2 Instances
   . Containerized apps (Amazon ECS)
   . Web apps (using IP address)
-  . Lambda can be used too, but is no used frequentely most common approach in lambda is API Gateway
+  . Lambda can be used too, but is no used frequently most common approach in lambda is API Gateway
 ** Target Groups
   . We can group instances to alb have distributed the load, can be a set of EC2 instances, lambda function or a set of ip address
 ** Stickyness is a feat to send all request from one user to the same instance is implemented by using a cookie
+** Inbound Rules for SG can bind with the ALB security group to restrict http traffic as pic bello
 
+image::content/pic/ALB_SG_RESTRICT_AND_BIND.png[]
 
+** Target Group and Listeners
+ . Listener checks for the connection requests, but each Load Balancer can have *one or more listeners* listening for connection request for the client
+ . Each listener has: protocol a port and a set of rules to route requests to targets
 
+image::content/pic/ALB_Multiple_Listeners.png[]
 
-Section Challenge
+ . Target Groups exists to group instances that ALB must to distribute the load between the service/instances in terraform you bind the alb listener to alb target group
+ . Multiple Target Groups - In a microservices architecture we can have thousands of services spread out in our aws account, so we need multiple ALBs? *_NOPE_* alb can support multiple microservices instances creating a separate target group for each microservices, below a hcl-terraform snippet to explain this, *_Classic Load Balancer Not Support multiple target groups_*
+ . Rules are executed in the order they are configured
 
-Quarkus,Camel/Fargate/ECR/ALB/Terraform
+image::content/pic/ALB_Multiple_target_groups.png[]
 
-All resources in terraform were did merge with the links down bellow
+image::content/pic/ALB_Listener_Rules.png[]
 
-https://gmusumeci.medium.com/how-to-deploy-aws-ecs-fargate-containers-step-by-step-using-terraform-545eeac743be
-https://github.com/duduribeiro/terraform_ecs_fargate_example
-https://engineering.finleap.com/posts/2020-02-20-ecs-fargate-terraform/
-https://github.com/turnerlabs/terraform-ecs-fargate/tree/master/env/dev
+[source, hcl-terraform]
+====
+    resource "aws_lb_listener_rule" "my_listener_rule" {
+      listener_arn = aws_lb_listener.my-lb-listener.arn
+      priority     = 100
+      action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.my-tg.arn
+      }
+      condition {
+        path_pattern {
+            values = ["/my-microservices-x/*"]
+        }
+      }
+    }
+====
 
-push to {{AWS_ACCOUNT_ID}}.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo
+ . Possibilities are by path/host/headers/Query Strings(?target=x)/IP Address
+
+== Section Challenge
+
+* Application Load Balance with Quarkus/Camel using AWS Fargate/ECR/ALB and Terraform
+* All resources in terraform were did merge with the links down bellow
+* All detail can be found over ./terraform/fargate
+
+https://gmusumeci.medium.com/how-to-deploy-aws-ecs-fargate-containers-step-by-step-using-terraform-545eeac743be[Deploy ECS Fargate Containers]
+
+https://github.com/duduribeiro/terraform_ecs_fargate_example[Terraform ECS Fargate]
+
+https://engineering.finleap.com/posts/2020-02-20-ecs-fargate-terraform/[ECS and Fargate Terraform]
+
+https://github.com/turnerlabs/terraform-ecs-fargate/tree/master/env/dev[ECS Template Fargate]
+
+https://github.com/DouglasGo8/terraform-udemy/tree/master/section-8[ECS EC2 Autoscaling]
+
+https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
