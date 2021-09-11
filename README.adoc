@@ -296,3 +296,5 @@ https://github.com/turnerlabs/terraform-ecs-fargate/tree/master/env/dev[ECS Temp
 https://github.com/DouglasGo8/terraform-udemy/tree/master/section-8[ECS EC2 Autoscaling]
 
 https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
+
+https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf
