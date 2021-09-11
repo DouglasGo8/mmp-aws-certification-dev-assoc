@@ -43,11 +43,11 @@ resource "aws_nat_gateway" "main-ngw" {
 }
 
 resource "aws_subnet" "subnet-private" {
-  vpc_id            = aws_vpc.main-vpc.id
-  cidr_block        = element(var.AWS_PRIVATE_SUBNETS, count.index)
-  availability_zone = element(var.AWS_AVAILABILITY_ZONES, count.index)
-  count             = length(var.AWS_PRIVATE_SUBNETS)
-
+  vpc_id                  = aws_vpc.main-vpc.id
+  cidr_block              = element(var.AWS_PRIVATE_SUBNETS, count.index)
+  availability_zone       = element(var.AWS_AVAILABILITY_ZONES, count.index)
+  count                   = length(var.AWS_PRIVATE_SUBNETS)
+  map_public_ip_on_launch = false
   tags = {
     Name        = "${var.AWS_PROJECT_NAME}-private-subnet-${var.AWS_ENVIRONMENT}-${format("%03d", count.index + 1)}"
     Environment = var.AWS_ENVIRONMENT
@@ -55,10 +55,11 @@ resource "aws_subnet" "subnet-private" {
 }
 
 resource "aws_subnet" "subnet-public" {
-  vpc_id            = aws_vpc.main-vpc.id
-  cidr_block        = element(var.AWS_PUBLIC_SUBNETS, count.index)
-  availability_zone = element(var.AWS_AVAILABILITY_ZONES, count.index)
-  count             = length(var.AWS_PUBLIC_SUBNETS)
+  vpc_id                  = aws_vpc.main-vpc.id
+  cidr_block              = element(var.AWS_PUBLIC_SUBNETS, count.index)
+  availability_zone       = element(var.AWS_AVAILABILITY_ZONES, count.index)
+  count                   = length(var.AWS_PUBLIC_SUBNETS)
+  map_public_ip_on_launch = true
 
   tags = {
     Name        = "${var.AWS_PROJECT_NAME}-public-subnet-${var.AWS_ENVIRONMENT}-${format("%03d", count.index + 1)}"

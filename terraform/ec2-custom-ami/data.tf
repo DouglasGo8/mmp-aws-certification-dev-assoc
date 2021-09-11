@@ -1,22 +1,16 @@
 
-data "aws_ami" "centos" {
-  owners      = ["679593333241"]
+data "aws_ami" "amzn2" {
   most_recent = true
 
   filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
+
+  filter {
     name   = "name"
-    values = ["CentOS Linux 7 x86_64 HVM EBS *"]
+    values = ["amzn2-ami-hvm*"] # regex-expression
   }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+  owners = ["amazon"]
 }
-
 

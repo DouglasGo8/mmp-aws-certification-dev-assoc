@@ -3,37 +3,13 @@ terraform {
 }
 
 resource "aws_launch_template" "httpd-launch-template" {
-  name                                 = "httpd_template"
-  name_prefix                          = "httpd_template"
-  ebs_optimized                        = true
-  disable_api_termination              = true
+  name_prefix                          = "httpd-launch-template"
   image_id                             = data.aws_ami.amzn2.id
   instance_type                        = var.AMZ_INSTANCE_TYPE
   user_data                            = filebase64("./httpd.sh")
   key_name                             = aws_key_pair.key-pub.key_name
-  vpc_security_group_ids               = [data.aws_security_group.allow-ssh-http.id]
+  vpc_security_group_ids               = [aws_security_group.sg-allow-http.id]
   instance_initiated_shutdown_behavior = "terminate"
-
-  instance_market_options {
-    market_type = "spot"
-  }
-
-  capacity_reservation_specification {
-    capacity_reservation_preference = "open"
-  }
-
-  monitoring {
-    enabled = false
-  }
-
-  cpu_options {
-    core_count       = 4
-    threads_per_core = 2
-  }
-
-  credit_specification {
-    cpu_credits = "standard"
-  }
 
   lifecycle {
     create_before_destroy = true
@@ -48,11 +24,11 @@ resource "aws_autoscaling_group" "httpd-asg" {
   desired_capacity = 1
   force_delete     = true
   vpc_zone_identifier = [
-    "${data.aws_subnet.main-public-1.id}",
-    "${data.aws_subnet.main-public-2.id}",
-    "${data.aws_subnet.main-public-3.id}"
+    data.aws_subnet.main-public-1.id,
+    data.aws_subnet.main-public-2.id,
+    data.aws_subnet.main-public-3.id
   ]
-  target_group_arns         = ["value"]
+  target_group_arns         = [aws_lb_target_group.alb-tg-httpd.arn]
   health_check_grace_period = 300
   health_check_type         = "ELB"
   enabled_metrics = [
@@ -67,12 +43,11 @@ resource "aws_autoscaling_group" "httpd-asg" {
     version = "$Latest"
   }
   tag {
-    key                 = "ASGHttpD"
+    key                 = "Name"
     value               = "EC2 Micro Instance"
     propagate_at_launch = true
   }
 }
-
 
 resource "aws_key_pair" "key-pub" {
   key_name   = "key-pub"

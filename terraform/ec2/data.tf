@@ -18,10 +18,10 @@ data "aws_subnet" "main-public-1" {
   id = "subnet-0a89dbf36b1230f6c"
 }
 
-data "aws_subnet" "main-public-2" {
-  id = "subnet-0a3f3a2ccda973b07"
+
+data "aws_security_group" "sg-ssh" {
+  id = "sg-07058b3144d231b3d"
+
 }
 
-data "aws_subnet" "main-public-3" {
-  id = "subnet-0214d67d90219273d"
-}
+data "aws_availability_zones" "available" {}

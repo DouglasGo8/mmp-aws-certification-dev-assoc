@@ -4,7 +4,7 @@ terraform {
 
 resource "aws_launch_template" "my-http-ec2-inst-template" {
 
-  name = "My HttpD WebServer"
+  name            = "My HttpD WebServer"
   default_version = "v1"
 
   block_device_mappings {
@@ -20,7 +20,7 @@ resource "aws_launch_template" "my-http-ec2-inst-template" {
   }
 
   cpu_options {
-    core_count = 4
+    core_count       = 4
     threads_per_core = 2
   }
 
@@ -32,7 +32,7 @@ resource "aws_launch_template" "my-http-ec2-inst-template" {
 
   ebs_optimized = true
 
-  image_id = "amzn2-ami-hvm-2.0.20200406-x86_640-gp2"
+  image_id                             = "amzn2-ami-hvm-2.0.20200406-x86_640-gp2"
   instance_initiated_shutdown_behavior = "terminate"
 
   instance_market_options {
@@ -73,6 +73,6 @@ resource "aws_launch_template" "my-http-ec2-inst-template" {
 }
 
 resource "aws_key_pair" "pub-key" {
-  key_name = "key-pub"
-  public_key = file("../../.secret/key.pub")
+  key_name   = "key-pub"
+  public_key = file("../.secret/key.pub")
 }

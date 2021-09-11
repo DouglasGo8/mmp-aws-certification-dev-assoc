@@ -297,4 +297,6 @@ https://github.com/DouglasGo8/terraform-udemy/tree/master/section-8[ECS EC2 Auto
 
 https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
 
-https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf
+https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf[AWS Cert Dev]
+
+All public subnets must have the property *_map_public_ip_on_launch_* as true
