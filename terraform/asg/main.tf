@@ -15,6 +15,7 @@ resource "aws_launch_template" "httpd-launch-template" {
     create_before_destroy = true
   }
 
+
 }
 
 resource "aws_autoscaling_group" "httpd-asg" {

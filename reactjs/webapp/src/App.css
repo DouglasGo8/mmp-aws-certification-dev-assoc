@@ -1,0 +1,13 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    flex: 100%;
+    margin-top: 50%;
+    text-align: center;
+    vertical-align: center;
+}
+.host {
+    font-weight: bold;
+    text-transform: uppercase;
+    color: orangered;
+}
