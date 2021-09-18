@@ -7,6 +7,7 @@ resource "aws_autoscaling_policy" "asp-main" {
   policy_type            = "SimpleScaling"
 }
 
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm
 resource "aws_cloudwatch_metric_alarm" "asma-main" {
   alarm_name          = "asma-main"
   alarm_description   = "CPU Metric over Cloudwatch"
@@ -16,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "asma-main" {
   namespace           = "AWS/EC2"
   period              = 120
   statistic           = "Average"
-  threshold           = 30
+  threshold           = 50
   dimensions = {
     "AutoScalinggroupName" = aws_autoscaling_group.nginx-asg.name
   }

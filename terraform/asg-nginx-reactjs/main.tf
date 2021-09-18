@@ -2,7 +2,6 @@ terraform {
   required_version = "~> 1.0.3"
 }
 
-
 resource "aws_launch_template" "nginx-launch-template" {
   name_prefix                          = "nginx-launch-template"
   image_id                             = data.aws_ami.ubuntu.id
@@ -29,18 +28,19 @@ resource "aws_iam_instance_profile" "ec2_ecr_iam_inst_profile" {
 
 resource "aws_autoscaling_group" "nginx-asg" {
   name             = "nginx-asg"
-  min_size         = 2
+  min_size         = 1
   max_size         = 3
   desired_capacity = 2
   force_delete     = true
 
+  # To test effect
   vpc_zone_identifier = [
     data.aws_subnet.main-public-1.id,
     data.aws_subnet.main-public-2.id,
     data.aws_subnet.main-public-3.id
   ]
   target_group_arns         = [aws_lb_target_group.alb-tg-nginx.arn]
-  health_check_grace_period = 300
+  health_check_grace_period = 120
   health_check_type         = "ELB"
   enabled_metrics = [
     "GroupMinSize",
@@ -66,6 +66,8 @@ resource "aws_iam_role" "ec2-ecr-role" {
   assume_role_policy = file("./policies/ecr-role.json")
 }
 
+# Best practice is use the policy referencing as external json file,
+# here is a just demostration
 resource "aws_iam_policy" "ec2-ecr-role-policy" {
   name   = "ec2-ecr-policy"
   policy = <<EOF

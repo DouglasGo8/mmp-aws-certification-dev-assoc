@@ -15,7 +15,7 @@ resource "aws_lb" "alb-nginx" {
 resource "aws_lb_listener" "alb-listener-nginx" {
   load_balancer_arn = aws_lb.alb-nginx.arn
   port              = 80
-  protocol          = "HTTP"
+  protocol          = "HTTP" # NLB must use TCP
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb-tg-nginx.arn
@@ -25,7 +25,7 @@ resource "aws_lb_listener" "alb-listener-nginx" {
 resource "aws_lb_target_group" "alb-tg-nginx" {
   name        = "alb-tg-nginx"
   port        = 80
-  protocol    = "HTTP"
+  protocol    = "HTTP" # NLB must use TCP
   target_type = "instance"
   vpc_id      = var.VPC_ID
 

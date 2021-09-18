@@ -252,13 +252,24 @@ image::content/pic/ALB_SG_RESTRICT_AND_BIND.png[]
 
 image::content/pic/ALB_Multiple_Listeners.png[]
 
- . Target Groups exists to group instances that ALB must to distribute the load between the service/instances in terraform you bind the alb listener to alb target group
- . Multiple Target Groups - In a microservices architecture we can have thousands of services spread out in our aws account, so we need multiple ALBs? *_NOPE_* alb can support multiple microservices instances creating a separate target group for each microservices, below a hcl-terraform snippet to explain this, *_Classic Load Balancer Not Support multiple target groups_*
+ . Target Groups exists to group instances that ALB must to distribute the load between the service/instances in
+terraform you bind the alb listener to alb target group
+ . Multiple Target Groups - In a microservices architecture we can have thousands of services
+spread out in our aws account, so we need multiple ALBs? *_NOPE_* ALB can support multiple
+microservices instances creating a separate target group for each microservices,
+below a hcl-terraform snippet to explain this, *_Classic Load Balancer Not Support multiple target groups_*
  . Rules are executed in the order they are configured
+ . We can create rules based on *_path_* (http(s)://somehost/path_for_service_a), based on *_host_* (http(s)://somehost)/
+based on headers (http(s)) and Query Strings (http(s)://somehost?target=a), based on IP Address (all request coming
+from a specific address)
+ . In summary we have a highly decoupled architecture, ALB ca have multiple listeners and each listener have multiple
+rules routing to a target group
 
 image::content/pic/ALB_Multiple_target_groups.png[]
 
 image::content/pic/ALB_Listener_Rules.png[]
+
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule[Resource: aws_lb_listener_rule]
 
 [source, hcl-terraform]
 ====
@@ -279,11 +290,138 @@ image::content/pic/ALB_Listener_Rules.png[]
 
  . Possibilities are by path/host/headers/Query Strings(?target=x)/IP Address
 
-== Section Challenge
+
+== AWS Auto Scaling Groups
+
+* Target groups are configured with static set of instances to scale out (when loads increase) and
+scale in (when the pick of loads stop and instances became idle)  automatically, we can achieve this config using
+*_auto scaling groups_*
+* ASG can launch On-Demand instances, Spot Intance or both, to do this as best practice use Launch Template, in terraform
+we can use *_aws_launch_template_* as demonstred bellow, more details in ./terraform/asg-httpd|asg-nginx-reactjs
+
+[source, hcl-terraform]
+----
+resource "aws_launch_template" "nginx-launch-template" {
+  name_prefix                          = "nginx-launch-template"
+  image_id                             = data.aws_ami.ubuntu.id
+  instance_type                        = var.AMZ_INSTANCE_TYPE
+  key_name                             = aws_key_pair.key-pub.key_name
+  user_data                            = filebase64("./reactjsapp.sh")
+  vpc_security_group_ids               = [aws_security_group.sg-allow-http.id]
+  instance_initiated_shutdown_behavior = "terminate"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_ecr_iam_inst_profile.name
+    #arn = aws_iam_role.ec2-ecr-role.arn
+  }
+}
+
+resource "aws_autoscaling_group" "nginx-asg" {
+  name             = "nginx-asg"
+  min_size         = 1
+  max_size         = 3
+  desired_capacity = 2
+  force_delete     = true
+
+  # To test effect
+  vpc_zone_identifier = [
+    data.aws_subnet.main-public-1.id,
+    data.aws_subnet.main-public-2.id,
+    data.aws_subnet.main-public-3.id
+  ]
+  target_group_arns         = [aws_lb_target_group.alb-tg-nginx.arn]
+  health_check_grace_period = 120
+  health_check_type         = "ELB"
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupTotalInstances"
+  ]
+  launch_template {
+    id      = aws_launch_template.nginx-launch-template.id
+    version = "$Latest"
+  }
+  tag {
+    key                 = "Name"
+    value               = "EC2 Micro Instance"
+    propagate_at_launch = true
+  }
+
+}
+----
+
+* Auto Scaling Components
+ . Launch Configuration/Template as EC2 AMIS Customs sizes etc
+ . Auto Scaling Group with min max size of this group and health checks
+ . Auto Scaling policies when and how to execute scaling
+ . Some policies to scaling with ASG
+
+image::content/pic/ASG_UseCases.png[]
+
+image::content/pic/ASG_Dynamic_UseCases.png[]
+
+
+* Network Load Balancer Terraform sample
+
+[source, hcl-terraform]
+----
+resource "aws_lb" "alb-nginx" {
+  name               = "alb-nginx"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = var.AMZ_SUBNETS
+  security_groups    = [aws_security_group.sg-allow-lb-http.id]
+
+  tags = {
+    Name = "alb-nginx"
+  }
+
+}
+
+resource "aws_lb_listener" "alb-listener-nginx" {
+  load_balancer_arn = aws_lb.alb-nginx.arn
+  port              = 80
+  protocol          = "TCP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb-tg-nginx.arn
+  }
+}
+
+resource "aws_lb_target_group" "alb-tg-nginx" {
+  name        = "alb-tg-nginx"
+  port        = 80
+  protocol    = "TCP"
+  target_type = "instance"
+  vpc_id      = var.VPC_ID
+
+  health_check {
+    port                = 80
+    interval            = 10
+    path                = "/"
+    protocol            = "TCP"
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
+  }
+}
+----
+
+
+
+== Section Challenges
 
 * Application Load Balance with Quarkus/Camel using AWS Fargate/ECR/ALB and Terraform
 * All resources in terraform were did merge with the links down bellow
-* All detail can be found over ./terraform/fargate
+* All details can be found over ./terraform/fargate
+* Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
+* All details can be found over ./terraform/asg-nginx-reactjs
 
 https://gmusumeci.medium.com/how-to-deploy-aws-ecs-fargate-containers-step-by-step-using-terraform-545eeac743be[Deploy ECS Fargate Containers]
 
@@ -302,3 +440,10 @@ https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/a
 All public subnets must have the property *_map_public_ip_on_launch_* as true
 
 https://github.com/Einsteinish/Terraform-Turotials/tree/master/Docker-Nginx-ALB-3-Containers-in-Private-Subnets-with-Dynamic-ASG[Ngix with ASG]
+
+https://quarkus.io/guides/amazon-lambda-http3
+https://aws.amazon.com/pt/blogs/aws-brasil/integracao-do-aws-lambda-com-o-quarkus/
+
+https://www.youtube.com/watch?v=geio38-zAdI
+
+https://how-to.vertx.io/aws-native-image-lambda-howto/
