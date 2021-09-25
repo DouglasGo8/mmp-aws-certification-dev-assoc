@@ -32,7 +32,7 @@ ssh -i {{pem}} ubuntu@{{PUBLIC_IP}}
 [.lead]
 == AWS ECR Quarkus push image using temp token in config
 
-[source,bash]
+[source, bash]
 ----
 mvn clean -DskipTests package -Pnative -Dquarkus.native.container-build=true
 docker build -f src/main/docker/Dockerfile.native -t myapp .
@@ -66,7 +66,7 @@ On-demand resource provisioning offer low costs (pay per use)
 - Avoiding "Undifferentiated heavy lifting"
 - AWS provides most of 200+ services
 
-== The main Links
+NOTE: All links used as ref in this course and challenges
 
 - https://aws.amazon.com/[AWS Cloud]
 - https://{{YOUR_IAM_ID}}.signin.aws.amazon.com/console[IAM User AWS Console]
@@ -76,6 +76,32 @@ On-demand resource provisioning offer low costs (pay per use)
 - https://code.quarkus.io/[Quarkus Coding]
 - https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/#links[Asciidoctor Docs]
 - https://www.pgadmin.org/download/pgadmin-4-apt/[pgAdmin4 APT]
+- https://gmusumeci.medium.com/how-to-deploy-aws-ecs-fargate-containers-step-by-step-using-terraform-545eeac743be[Deploy ECS Fargate Containers]
+- https://github.com/duduribeiro/terraform_ecs_fargate_example[Terraform ECS Fargate]
+- https://engineering.finleap.com/posts/2020-02-20-ecs-fargate-terraform/[ECS and Fargate Terraform]
+- https://github.com/turnerlabs/terraform-ecs-fargate/tree/master/env/dev[ECS Template Fargate]
+- https://github.com/DouglasGo8/terraform-udemy/tree/master/section-8[ECS EC2 Autoscaling]
+- https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
+- https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf[AWS Cert Dev]
+- https://github.com/Einsteinish/Terraform-Turotials/tree/master/Docker-Nginx-ALB-3-Containers-in-Private-Subnets-with-Dynamic-ASG[Ngix with ASG]
+- https://quarkus.io/guides/amazon-lambda-http[AWS Lambda with RestEasy, Undertow or Vert.x Web]
+- https://aws.amazon.com/pt/blogs/aws-brasil/integracao-do-aws-lambda-com-o-quarkus/
+- https://www.youtube.com/watch?v=geio38-zAdI[Quarkus #47: AWS Lambda]
+- https://how-to.vertx.io/aws-native-image-lambda-howto/[AWS Native Image Lambda HowTo]
+
+TIP: All tips to find possible issues in IaC scripts
+
+* All public subnets must have the property *_map_public_ip_on_launch_* as true
+
+IMPORTANT: Section Challenges
+
+* Application Load Balance with Quarkus/Camel using AWS Fargate/ECR/ALB and Terraform
+* All resources in terraform were did merge with the links in links Sections
+* All details can be found over ./terraform/
+* Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
+* Lambda using Native Image (GraalVM) with Vert.x/Apache Camel and DynamoDb over Terraform and API Gateway only with a GET method
+* Lambda using Node.js and Terraform and API Gateway only with a GET method
+
 == IAM Section
 
 1. Root User -> IAM User in a group with permissions
@@ -91,8 +117,9 @@ with regulatory and security compliance needs
 
 image::content/pic/RegionsAWS.png[]
 
-== EC2 Fundamentals:: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance[Terraform aws_instance]
+== EC2 Fundamentals
 
+* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance[Terraform aws_instance]
 * EC2 Elastic Computer Cloud, represents rented virtual servers, virtual machines billed by second
 * We can create and manage EC2 lifecycle of EC2 instances create load balancers and auto-scaling groups, EC2 have
 ephemeral volumes, but we can attach permanent storages on them
@@ -413,37 +440,16 @@ resource "aws_lb_target_group" "alb-tg-nginx" {
 }
 ----
 
+== Serverless Architecture Pt1
 
+IMPORTANT: Serverkess *does NOT means* "No Servers"
 
-== Section Challenges
+* Serverless means - No worry about Infrastructure, flexible scaling, automated high available, pay for use
+* With Serverless you can keep focus over the code
+* Some kind serverless Apps in AWS - Fargate, Lambda, API Gateway, Cognito, DynamoDB
 
-* Application Load Balance with Quarkus/Camel using AWS Fargate/ECR/ALB and Terraform
-* All resources in terraform were did merge with the links down bellow
-* All details can be found over ./terraform/fargate
-* Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
-* All details can be found over ./terraform/asg-nginx-reactjs
+=== AWS Lambda
 
-https://gmusumeci.medium.com/how-to-deploy-aws-ecs-fargate-containers-step-by-step-using-terraform-545eeac743be[Deploy ECS Fargate Containers]
-
-https://github.com/duduribeiro/terraform_ecs_fargate_example[Terraform ECS Fargate]
-
-https://engineering.finleap.com/posts/2020-02-20-ecs-fargate-terraform/[ECS and Fargate Terraform]
-
-https://github.com/turnerlabs/terraform-ecs-fargate/tree/master/env/dev[ECS Template Fargate]
-
-https://github.com/DouglasGo8/terraform-udemy/tree/master/section-8[ECS EC2 Autoscaling]
-
-https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
-
-https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf[AWS Cert Dev]
-
-All public subnets must have the property *_map_public_ip_on_launch_* as true
-
-https://github.com/Einsteinish/Terraform-Turotials/tree/master/Docker-Nginx-ALB-3-Containers-in-Private-Subnets-with-Dynamic-ASG[Ngix with ASG]
-
-https://quarkus.io/guides/amazon-lambda-http3
-https://aws.amazon.com/pt/blogs/aws-brasil/integracao-do-aws-lambda-com-o-quarkus/
-
-https://www.youtube.com/watch?v=geio38-zAdI
-
-https://how-to.vertx.io/aws-native-image-lambda-howto/
+* Run your code without thinking about Servers, (but stay locked in AWS =))
+* AWS Lambda is the most popular choice in AWS, only about worry your code
+* Pay of number of requests, duration of requests and Memory
