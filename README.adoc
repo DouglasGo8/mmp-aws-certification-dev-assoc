@@ -2,8 +2,7 @@
 
 [.lead]
 
-*_This course includes Quarkus v2.x, Apache Camel Quarkus v2.x and Terraform v1.x with all challenge details
-founded over the Course_*
+*_This course includes Quarkus v2.x, Eclipse Vert.x 4.x, Apache Camel Quarkus v2.x and Terraform v1.x_*
 
 IMPORTANT: *_Install JSON Viewers on Browser_*
 
@@ -95,12 +94,15 @@ TIP: All tips to find possible issues in IaC scripts
 
 IMPORTANT: Section Challenges
 
+****
 * Application Load Balance with Quarkus/Camel using AWS Fargate/ECR/ALB and Terraform
 * All resources in terraform were did merge with the links in links Sections
 * All details can be found over ./terraform/
 * Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
-* Lambda using Native Image (GraalVM) with Vert.x/Apache Camel and DynamoDb over Terraform and API Gateway only with a GET method
-* Lambda using Node.js and Terraform and API Gateway only with a GET method
+* Lambda using Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only
+a GET method GET method
+* Lambda using Node.js, API Gateway and DynamoDb over Terraform IaC, with only a GET method
+****
 
 == IAM Section
 
@@ -442,7 +444,7 @@ resource "aws_lb_target_group" "alb-tg-nginx" {
 
 == Serverless Architecture Pt1
 
-IMPORTANT: Serverkess *does NOT means* "No Servers"
+IMPORTANT: Serverless *does NOT means* "No Servers"
 
 * Serverless means - No worry about Infrastructure, flexible scaling, automated high available, pay for use
 * With Serverless you can keep focus over the code
@@ -450,6 +452,46 @@ IMPORTANT: Serverkess *does NOT means* "No Servers"
 
 === AWS Lambda
 
-* Run your code without thinking about Servers, (but stay locked in AWS =))
+* Run your code without thinking about Servers, (but stay locked in AWS =) full vendor control)
 * AWS Lambda is the most popular choice in AWS, only about worry your code
 * Pay of number of requests, duration of requests and Memory
+* As a good practice is enable X-Ray Traces
+* To ensure that a critical lambda needs always run we need specify a reserved concurrency, e.g We can reseserved up to
+900 nstances to a specific lambda
+* Lambda execution needs of a temporary runtime env, lambdas tries to reuse the execution context when possible, in the
+same execution context, object declares outside of hanlder remain initialized e.g DynamoDb
+* AWS reserve /tmp with 512mb disk space as caching to be reused across invocations
+* Cold start is a common problem for the first request to a lambda function is is tied to the first request,
+to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario
+we have a more expensive service
+* In Provisionde with reserved concurrency scenario, more instancens can coming than is allowed *_throttling_*
+concept can be applied, and the request will recieve 429 status code
+* Lambda can be invoked in both Sync/Async scenarios, in sync we have AWS API Gateway, CloudFront and Lex, to Async we
+have no wait for responses in aws services, we can Invoke as Task startTask over EC2 and runTask in a EC2/ECS service,
+we can sendo a SQS/SNS message when some event happens in S3, when a successful execution is done an invocation Record
+can be sent other message to SQS/SNS or another lambda function, but in case of fails there is a configuration options
+to async ops with retry, dlq and max age of event options
+* A Lambda@Edge location (Cloudfront) can be used to invoke the lambda function, but have a restriction and can be used
+just with to Python or Node.js (Javascript)
+* Alias can pointer to a specific version of lambda
+* Lambda code is typically dependent on other libraries, using layers we can share libs among lambdas and the
+*size* of lambda can be reduced
+* Sum up as best practices to use lambda we have, take advantage of *exection context reuse* to improve performance,
+initialize SDK clients and database connections outside of function handler, cache static assets locally in the /tmp dir
+*env variables* to pass operation parameters, *minimize your deploy package size as small possible*, avoid recursive code
+
+[source, javascript]
+----
+const AWS = require('aws-sdk'); // keeps initialized in the same context
+const dynamo = new AWS.DynamoDB.DocumentClient();
+exports.handler = async (event) => {
+    // Other Logic
+}
+----
+
+
+.First Execution Lambda using Node.js v12.x
+image::content/pic/LAMBA_NodeJS_FirstExecution_Info.png[First Execution Lambda using Node.js v12.x]
+
+.X-Ray Enabled Lambda using Node.js v12.x
+image::content/pic/LAMBDA_NodeJS_XRay_Enabled.png[X-Ray Enabled Lambda using Node.js v12.x]
