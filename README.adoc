@@ -1,15 +1,13 @@
 = AWS Certification - Developer Associate 2021
 
 [.lead]
-
 *_This course includes Quarkus v2.x, Eclipse Vert.x 4.x, Apache Camel Quarkus v2.x and Terraform v1.x_*
 
 IMPORTANT: *_Install JSON Viewers on Browser_*
 
 IMPORTANT: *_Why we need Cloud?_*
 
-- Considering an Online Shop App, with peak load during a black friday, but you have less load out this time, this
-mean waste resources in idle loads, company bought infrastructure to wait that such load, and the company falls in
+- Considering an Online Shop App, with peak load during a black friday, but you have less load out this time, this mean waste resources in idle loads, company bought infrastructure to wait that such load, and the company falls in
 1. Low infrastructure utilization
 2. Needs ahead of time planning
 3. High costs of procuring infrastructure
@@ -18,6 +16,7 @@ mean waste resources in idle loads, company bought infrastructure to wait that s
 
 [.lead]
 == AWS Secret Generation
+
 [source,bash]
 ----
 ssh-keygen -f {{PEM_FILE}}.pem
@@ -31,7 +30,7 @@ ssh -i {{pem}} ubuntu@{{PUBLIC_IP}}
 [.lead]
 == AWS ECR Quarkus push image using temp token in config
 
-[source, bash]
+[source,bash]
 ----
 mvn clean -DskipTests package -Pnative -Dquarkus.native.container-build=true
 docker build -f src/main/docker/Dockerfile.native -t myapp .
@@ -44,10 +43,12 @@ docker tag myapp {{AWS_ACCOUNT_ID}}.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo
 # docker run --rm --name myapp -p 8080:8080 myapp # only local test purpose - must be remove after test
 docker push {{AWS_ACCOUNT_ID}}.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo:myapp
 ----
+
 == AWS ECR Login output
 
 * The ##*_aws ecr get-login.._*## up command will genenerate the following message
-[source, html]
+
+[source,html]
 ----
 WARNING! Your password will be stored unencrypted in {{YOUR_PATH}}/.docker/config.json.
 Configure a credential helper to remove this warning. See
@@ -58,9 +59,8 @@ Login Succeeded
 ----
 
 [.lead]
+- With the Cloud you buy (renting just needed Resources), and release it when not need them, On-demand resource provisioning offer low costs (pay per use)
 
-- With the Cloud you buy (renting just needed Resources), and release it when not need them,
-On-demand resource provisioning offer low costs (pay per use)
 - No upfront planning needed
 - Avoiding "Undifferentiated heavy lifting"
 - AWS provides most of 200+ services
@@ -99,8 +99,7 @@ IMPORTANT: Section Challenges
 * All resources in terraform were did merge with the links in links Sections
 * All details can be found over ./terraform/
 * Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
-* Lambda using Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only
-a GET method GET method
+* Lambda using Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only a GET method GET method
 * Lambda using Node.js, API Gateway and DynamoDb over Terraform IaC, with only a GET method
 ****
 
@@ -108,14 +107,11 @@ a GET method GET method
 
 1. Root User -> IAM User in a group with permissions
 2. Never ever use Root User to create or manage resources
-3. As Root user type go to IAM console search and create a group and after the user, *_e.g. DevGroup_* and their
-policies -> *_e.g. DevUser_*, assign it to a  group, provides *_Programmatic access & AWS Management Console Access_*
+3. As Root user type go to IAM console search and create a group and after the user, *_e.g. DevGroup_* and their policies -> *_e.g. DevUser_*, assign it to a group, provides *_Programmatic access & AWS Management Console Access_*
 
 == Regions and Zones
 
-1. AWS provides multiple zones classified as regions (20+) that means multiple data centers spread around the world
-us-east-1 is the most common region used, in general choose that region based on your users and data are located,
-with regulatory and security compliance needs
+1. AWS provides multiple zones classified as regions (20+) that means multiple data centers spread around the world us-east-1 is the most common region used, in general choose that region based on your users and data are located, with regulatory and security compliance needs
 
 image::content/pic/RegionsAWS.png[]
 
@@ -123,15 +119,15 @@ image::content/pic/RegionsAWS.png[]
 
 * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance[Terraform aws_instance]
 * EC2 Elastic Computer Cloud, represents rented virtual servers, virtual machines billed by second
-* We can create and manage EC2 lifecycle of EC2 instances create load balancers and auto-scaling groups, EC2 have
-ephemeral volumes, but we can attach permanent storages on them
+* We can create and manage EC2 lifecycle of EC2 instances create load balancers and auto-scaling groups, EC2 have ephemeral volumes, but we can attach permanent storages on them
 * The SSH connection bellow is exclusively to Ubuntu Instances, in that case for AMZ instance must be ec2-user@public_ip
 
-[source, bash]
+[source,bash]
 ----
 ssh -i {{PEM}}.file ubuntu@public_ip
 ps up $pid
 ----
+
 * Security Groups Rules for EC2 Instances
 ** Security groups are *default deny*, if no rules configured no outbound/inbound traffic is allowed
 ** Can specify *allow rules ONLY*
@@ -144,23 +140,23 @@ ps up $pid
 
 image::content/pic/UsedTo_SG_InOutBound_Rules.png[]
 
-* There are 270+ instance across 40+ instance types for different workloads to optimized combination of
-compute(CPU, GPU), memory, disk (storage) and networking
+* There are 270+ instance across 40+ instance types for different workloads to optimized combination of compute(CPU, GPU), memory, disk (storage) and networking
 
 * Classify a specification
 ** t2.micro
 *** t - instance family
 *** 2 - generation, improvements with each gen.
-*** micro - size (nano < micro < small < medium < large < xlarge < ...)
-##As sizes increases how much cpu/memory/storage/networking must increase proportionately##
+*** micro - size (nano < micro < small < medium < large < xlarge < ...) ##As sizes increases how much cpu/memory/storage/networking must increase proportionately##
 *** Using metadata information over EC2 to get details about the instance (Runs the commands inside the EC2 Machine)
-[source, bash]
+
+[source,bash]
 ----
 sudo su
 curl http:://169.254.169.254/latest/meta-data/
 curl http:://169.254.169.254/latest/meta-data/ami-id
 curl http:://169.254.169.254/latest/dynamic/instance-identity
 ----
+
 *** Sample of using http:://169.254.169.254/latest/dynamic/instance-identity/document
 
 image::content/pic/EC2_Metadata_Dynamic_Intance_identity_Document.png[]
@@ -169,7 +165,7 @@ image::content/pic/EC2_Metadata_Dynamic_Intance_identity_Document.png[]
 
 image::content/pic/View_Change_EC2_UserData.png[Change/View User Data on EC2 Instance]
 
-[source, hcl-terraform]
+[source,hcl-terraform]
 ----
 resource "aws_instance" "aws-ec2-micro-instance" {
   ami                    = lookup(var.amis, var.region)
@@ -199,12 +195,9 @@ resource "aws_instance" "aws-ec2-micro-instance" {
 ** Two different corporate nets can have resources with same private IP address
 ** All EC2 instances are assigned with IP private address
 ** Public IP creation in EC2 can be enabled for EC2 instances in public subnet
-** When you *stop* an EC2 instance, public IP address will be lost, Public IPs are ephemeral, to keep the same ip we need to
-configure an elastic ip, but is not recommended practice
-** Elastic IP can be switched to another EC2 instance *within the same region*, *_must be detached manually_* otherwise it
-won't be released, you are billed when an EIP (Elastic IP) address *_IS NOT ASSOCIATED_* with any EC2 instance
-* Installing OS Patches and software using userdata at launch of EC2 instances *increase boot up* time with appropriated
-hardening image build
+** When you *stop* an EC2 instance, public IP address will be lost, Public IPs are ephemeral, to keep the same ip we need to configure an elastic ip, but is not recommended practice
+** Elastic IP can be switched to another EC2 instance *within the same region*, *_must be detached manually_* otherwise it won't be released, you are billed when an EIP (Elastic IP) address *_IS NOT ASSOCIATED_* with any EC2 instance
+* Installing OS Patches and software using userdata at launch of EC2 instances *increase boot up* time with appropriated hardening image build
 * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template#capacity-reservation-specification[AWS EC2 launch Template demo]
 * AMis contains
 ** Root volume block storage
@@ -226,15 +219,15 @@ image::content/pic/EC2_important_Scenarios_pt2.png[]
 
 Classifing Transport Layers::
 
- Network Layer:::
-   . IP (Internet Protocol) - Transfer Bytes, unreliable
- Transport Layers:::
-   . TCP (Transmission Control) - Reliability > Performance
-   . TLS (Transport Layer Security) - Secure TCP
-   . UDP (User Datagram Protocol) - Performance > Reliability
- Application Layer:::
-   . HTTP (Hypertext transfer protocol) - Stateless Request/Response Cycle
-   . HTTPs: Secure HTTP
+Network Layer:::
+. IP (Internet Protocol) - Transfer Bytes, unreliable
+Transport Layers:::
+. TCP (Transmission Control) - Reliability > Performance
+. TLS (Transport Layer Security) - Secure TCP
+. UDP (User Datagram Protocol) - Performance > Reliability
+Application Layer:::
+. HTTP (Hypertext transfer protocol) - Stateless Request/Response Cycle
+. HTTPs: Secure HTTP
 
 ====
 ----
@@ -242,57 +235,46 @@ Application Layer (Layer 7) - HTTP/HTTPS/SMTP
 Most apps use this layer - Web Apps/REST API(HTTP/HTTPS), Email Servers(SMTP), File Transfers(FTP)
 All these apps use TCP/TLS at network layer (for reliability)
 ----
+
 ----
 Transport Layer (Layer 4) - TCP TLS UDP
 Apps that needing high performance *directly* communicate at transport layer, gamming apps/live video streaming use UDP
 ----
+
 ----
 Network Layer (Layer 3) - IP
 ----
 ====
 
-> Three type of AWS ELB
->
-> > *Classic Load Balancer* (Layer 4 and Layer 7) **deprecated** note recomended by AWS, with support TCP, SSL/TLS and HTTP/HTTP(S) over Layer 4/7
->
-> > *Application Load Balancer* (Layer 7) - new generation to supporting HTTP/HTTPS and advanced routing approaches
->
-> > *Network Load Balancer* (Layer 4) - New generation supporting TCP/TLS and UDP
+> Three type of AWS ELB > > > *Classic Load Balancer* (Layer 4 and Layer 7) **deprecated** note recomended by AWS, with support TCP, SSL/TLS and HTTP/HTTP(S) over Layer 4/7 > > > *Application Load Balancer* (Layer 7) - new generation to supporting HTTP/HTTPS and advanced routing approaches > > > *Network Load Balancer* (Layer 4) - New generation supporting TCP/TLS and UDP
 
 * Application Load Balancer
 
-** Most Popular and frequently used ELB in AWS, support WebSockets and HTTP/HTTPs over Layer 7, with support all import lb feat, and *automatically* scales
-based on demand
+** Most Popular and frequently used ELB in AWS, support WebSockets and HTTP/HTTPs over Layer 7, with support all import lb feat, and *automatically* scales based on demand
 ** Can load balance between
-  . EC2 Instances
-  . Containerized apps (Amazon ECS)
-  . Web apps (using IP address)
-  . Lambda can be used too, but is no used frequently most common approach in lambda is API Gateway
+. EC2 Instances
+. Containerized apps (Amazon ECS)
+. Web apps (using IP address)
+. Lambda can be used too, but is no used frequently most common approach in lambda is API Gateway
 ** Target Groups
-  . We can group instances to alb have distributed the load, can be a set of EC2 instances, lambda function or a set of ip address
+. We can group instances to alb have distributed the load, can be a set of EC2 instances, lambda function or a set of ip address
 ** Stickyness is a feat to send all request from one user to the same instance is implemented by using a cookie
 ** Inbound Rules for SG can bind with the ALB security group to restrict http traffic as pic bello
 
 image::content/pic/ALB_SG_RESTRICT_AND_BIND.png[]
 
 ** Target Group and Listeners
- . Listener checks for the connection requests, but each Load Balancer can have *one or more listeners* listening for connection request for the client
- . Each listener has: protocol a port and a set of rules to route requests to targets
+. Listener checks for the connection requests, but each Load Balancer can have *one or more listeners* listening for connection request for the client
+. Each listener has: protocol a port and a set of rules to route requests to targets
 
 image::content/pic/ALB_Multiple_Listeners.png[]
 
- . Target Groups exists to group instances that ALB must to distribute the load between the service/instances in
-terraform you bind the alb listener to alb target group
- . Multiple Target Groups - In a microservices architecture we can have thousands of services
-spread out in our aws account, so we need multiple ALBs? *_NOPE_* ALB can support multiple
-microservices instances creating a separate target group for each microservices,
-below a hcl-terraform snippet to explain this, *_Classic Load Balancer Not Support multiple target groups_*
- . Rules are executed in the order they are configured
- . We can create rules based on *_path_* (http(s)://somehost/path_for_service_a), based on *_host_* (http(s)://somehost)/
-based on headers (http(s)) and Query Strings (http(s)://somehost?target=a), based on IP Address (all request coming
-from a specific address)
- . In summary we have a highly decoupled architecture, ALB ca have multiple listeners and each listener have multiple
-rules routing to a target group
+. Target Groups exists to group instances that ALB must to distribute the load between the service/instances in terraform you bind the alb listener to alb target group
+. Multiple Target Groups - In a microservices architecture we can have thousands of services spread out in our aws account, so we need multiple ALBs?
+*_NOPE_* ALB can support multiple microservices instances creating a separate target group for each microservices, below a hcl-terraform snippet to explain this, *_Classic Load Balancer Not Support multiple target groups_*
+. Rules are executed in the order they are configured
+. We can create rules based on *_path_* (http(s)://somehost/path_for_service_a), based on *_host_* (http(s)://somehost)/ based on headers (http(s)) and Query Strings (http(s)://somehost?target=a), based on IP Address (all request coming from a specific address)
+. In summary we have a highly decoupled architecture, ALB ca have multiple listeners and each listener have multiple rules routing to a target group
 
 image::content/pic/ALB_Multiple_target_groups.png[]
 
@@ -300,7 +282,7 @@ image::content/pic/ALB_Listener_Rules.png[]
 
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule[Resource: aws_lb_listener_rule]
 
-[source, hcl-terraform]
+[source,hcl-terraform]
 ====
     resource "aws_lb_listener_rule" "my_listener_rule" {
       listener_arn = aws_lb_listener.my-lb-listener.arn
@@ -317,18 +299,14 @@ https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_l
     }
 ====
 
- . Possibilities are by path/host/headers/Query Strings(?target=x)/IP Address
-
+. Possibilities are by path/host/headers/Query Strings(?target=x)/IP Address
 
 == AWS Auto Scaling Groups
 
-* Target groups are configured with static set of instances to scale out (when loads increase) and
-scale in (when the pick of loads stop and instances became idle)  automatically, we can achieve this config using
-*_auto scaling groups_*
-* ASG can launch On-Demand instances, Spot Intance or both, to do this as best practice use Launch Template, in terraform
-we can use *_aws_launch_template_* as demonstred bellow, more details in ./terraform/asg-httpd|asg-nginx-reactjs
+* Target groups are configured with static set of instances to scale out (when loads increase) and scale in (when the pick of loads stop and instances became idle) automatically, we can achieve this config using *_auto scaling groups_*
+* ASG can launch On-Demand instances, Spot Intance or both, to do this as best practice use Launch Template, in terraform we can use *_aws_launch_template_* as demonstred bellow, more details in ./terraform/asg-httpd|asg-nginx-reactjs
 
-[source, hcl-terraform]
+[source,hcl-terraform]
 ----
 resource "aws_launch_template" "nginx-launch-template" {
   name_prefix                          = "nginx-launch-template"
@@ -386,10 +364,10 @@ resource "aws_autoscaling_group" "nginx-asg" {
 ----
 
 * Auto Scaling Components
- . Launch Configuration/Template as EC2 AMIS Customs sizes etc
- . Auto Scaling Group with min max size of this group and health checks
- . Auto Scaling policies when and how to execute scaling
- . Some policies to scaling with ASG
+. Launch Configuration/Template as EC2 AMIS Customs sizes etc
+. Auto Scaling Group with min max size of this group and health checks
+. Auto Scaling policies when and how to execute scaling
+. Some policies to scaling with ASG
 
 image::content/pic/ASG_UseCases.png[]
 
@@ -398,7 +376,7 @@ image::content/pic/ASG_Dynamic_UseCases.png[]
 
 * Network Load Balancer Terraform sample
 
-[source, hcl-terraform]
+[source,hcl-terraform]
 ----
 resource "aws_lb" "alb-nginx" {
   name               = "alb-nginx"
@@ -456,31 +434,18 @@ IMPORTANT: Serverless *does NOT means* "No Servers"
 * AWS Lambda is the most popular choice in AWS, only about worry your code
 * Pay of number of requests, duration of requests and Memory
 * As a good practice is enable X-Ray Traces
-* To ensure that a critical lambda needs always run we need specify a reserved concurrency, e.g We can reseserved up to
-900 nstances to a specific lambda
-* Lambda execution needs of a temporary runtime env, lambdas tries to reuse the execution context when possible, in the
-same execution context, object declares outside of hanlder remain initialized e.g DynamoDb
+* To ensure that a critical lambda needs always run we need specify a reserved concurrency, e.g We can reseserved up to 900 nstances to a specific lambda
+* Lambda execution needs of a temporary runtime env, lambdas tries to reuse the execution context when possible, in the same execution context, object declares outside of hanlder remain initialized e.g DynamoDb
 * AWS reserve /tmp with 512mb disk space as caching to be reused across invocations
-* Cold start is a common problem for the first request to a lambda function is is tied to the first request,
-to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario
-we have a more expensive service
-* In Provisionde with reserved concurrency scenario, more instancens can coming than is allowed *_throttling_*
-concept can be applied, and the request will recieve 429 status code
-* Lambda can be invoked in both Sync/Async scenarios, in sync we have AWS API Gateway, CloudFront and Lex, to Async we
-have no wait for responses in aws services, we can Invoke as Task startTask over EC2 and runTask in a EC2/ECS service,
-we can sendo a SQS/SNS message when some event happens in S3, when a successful execution is done an invocation Record
-can be sent other message to SQS/SNS or another lambda function, but in case of fails there is a configuration options
-to async ops with retry, dlq and max age of event options
-* A Lambda@Edge location (Cloudfront) can be used to invoke the lambda function, but have a restriction and can be used
-just with to Python or Node.js (Javascript)
+* Cold start is a common problem for the first request to a lambda function is is tied to the first request, to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario we have a more expensive service
+* In Provisionde with reserved concurrency scenario, more instancens can coming than is allowed *_throttling_* concept can be applied, and the request will recieve 429 status code
+* Lambda can be invoked in both Sync/Async scenarios, in sync we have AWS API Gateway, CloudFront and Lex, to Async we have no wait for responses in aws services, we can Invoke as Task startTask over EC2 and runTask in a EC2/ECS service, we can sendo a SQS/SNS message when some event happens in S3, when a successful execution is done an invocation Record can be sent other message to SQS/SNS or another lambda function, but in case of fails there is a configuration options to async ops with retry, dlq and max age of event options
+* A Lambda@Edge location (Cloudfront) can be used to invoke the lambda function, but have a restriction and can be used just with to Python or Node.js (Javascript)
 * Alias can pointer to a specific version of lambda
-* Lambda code is typically dependent on other libraries, using layers we can share libs among lambdas and the
-*size* of lambda can be reduced
-* Sum up as best practices to use lambda we have, take advantage of *exection context reuse* to improve performance,
-initialize SDK clients and database connections outside of function handler, cache static assets locally in the /tmp dir
-*env variables* to pass operation parameters, *minimize your deploy package size as small possible*, avoid recursive code
+* Lambda code is typically dependent on other libraries, using layers we can share libs among lambdas and the *size* of lambda can be reduced
+* Sum up as best practices to use lambda we have, take advantage of *exection context reuse* to improve performance, initialize SDK clients and database connections outside of function handler, cache static assets locally in the /tmp dir *env variables* to pass operation parameters, *minimize your deploy package size as small possible*, avoid recursive code
 
-[source, javascript]
+[source,javascript]
 ----
 const AWS = require('aws-sdk'); // keeps initialized in the same context
 const dynamo = new AWS.DynamoDB.DocumentClient();
@@ -489,9 +454,52 @@ exports.handler = async (event) => {
 }
 ----
 
-
 .First Execution Lambda using Node.js v12.x
 image::content/pic/LAMBA_NodeJS_FirstExecution_Info.png[First Execution Lambda using Node.js v12.x]
 
 .X-Ray Enabled Lambda using Node.js v12.x
 image::content/pic/LAMBDA_NodeJS_XRay_Enabled.png[X-Ray Enabled Lambda using Node.js v12.x]
+
+=== AWS API Gateway
+
+* Based on Resources *_todos_*, *_todos/{id}_*
+* Actions - HTTPS Methods - GET, PUT, POST, DELETE
+* API Gateway can *_publish,maintain,monitor,and secure APIs at any scale_*, supports HTTP(s) and WebSockets
+(two way communication - chat apps and streams dashboards)
+
+image::content/pic/API_GATEWAY_Approaches.png[]
+
+* We can customize all lifecylcle in gateway, [Method Request (Auth, Header, etc) - Integration Request,
+Integration Response Method Response]
+
+.Sample of Response integration Screen in AWS API Gateway
+image::content/pic/API_GATEWAY_Integration_Response.png[]
+
+[source, hcl-terraform]
+----
+# Sample of Response integration Screen in AWS API Gateway using Terraform
+----
+
+.Sample of AWS API Gateway and Lambda Integration
+image::content/pic/API_GATEWAY_Lambda_Integration.png[]
+
+* With mapping templates we can customize all Requests sent to Lambdas using ##Method Request passthrough##
+
+.Sample of Template "`Method Request passthrough`"
+image::content/pic/API_GATEWAY_Mapping_Template_RequestPassthrough.png[]
+
+.Sample of Event details using Method Request passthrough over Lambda Function
+image::content/pic/API_GATEWAY_EventDetail_MappingTemplate_Request_passthrough.png[]
+
+* JSON Schema validation https://json-schema.org/learn/getting-started-step-by-step.html[JSON Schema Validation]
+
+.Sample of Validation Request Body with a Model Schema to Use over Request Body Model
+image::content/pic/API_GATEWAY_Request_Validation_Model_Schema.png[]
+
+.Sample of Pre-defined Gateway Responses to BAD_REQUEST Sample
+image::content/pic/API_GATEWAY_PreDefined_Responses.png[]
+
+.Sample of a deploying a new Stage in AWS Gateway
+image::content/pic/API_GATEWAY_Deploy_Stage.png[]
+
+* HTTP API - API Gateway
