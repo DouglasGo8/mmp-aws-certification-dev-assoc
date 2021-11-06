@@ -72,6 +72,7 @@ NOTE: All links used as ref in this course and challenges
 - https://camel.apache.org/[Apache Camel]
 - https://camel.apache.org/camel-quarkus/latest/[Apache Camel Extensions for Quarkus]
 - https://quarkus.io/[Quarkus]
+- https://quarkus.io/guides/building-native-image[Building a Native Executable]
 - https://code.quarkus.io/[Quarkus Coding]
 - https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/#links[Asciidoctor Docs]
 - https://www.pgadmin.org/download/pgadmin-4-apt/[pgAdmin4 APT]
@@ -83,10 +84,23 @@ NOTE: All links used as ref in this course and challenges
 - https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
 - https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf[AWS Cert Dev]
 - https://github.com/Einsteinish/Terraform-Turotials/tree/master/Docker-Nginx-ALB-3-Containers-in-Private-Subnets-with-Dynamic-ASG[Ngix with ASG]
+
 - https://quarkus.io/guides/amazon-lambda-http[AWS Lambda with RestEasy, Undertow or Vert.x Web]
 - https://aws.amazon.com/pt/blogs/aws-brasil/integracao-do-aws-lambda-com-o-quarkus/
 - https://www.youtube.com/watch?v=geio38-zAdI[Quarkus #47: AWS Lambda]
 - https://how-to.vertx.io/aws-native-image-lambda-howto/[AWS Native Image Lambda HowTo]
+- https://docs.aws.amazon.com/lambda/latest/dg/lambda-java.html[Building Lambda functions with Java]
+
+- https://sysgears.com/articles/moving-lambda-function-from-serverless-to-terraform/
+- https://medium.com/@pra4mesh/aws-lambda-in-java-and-terraform-544da9102e37
+
+- https://adamtheautomator.com/terraform-aws-lambda/
+
+- https://github.com/nasa/cumulus/blob/master/example/cumulus-tf/lambdas.tf
+
+- https://camel.apache.org/components/3.12.x/aws2-ddb-component.html[AWS 2 DYNAMODB Apache Camel]
+
+- https://medium.com/swlh/deploy-aws-lambda-and-dynamodb-using-terraform-6e04f62a3165
 
 TIP: All tips to find possible issues in IaC scripts
 
@@ -99,7 +113,7 @@ IMPORTANT: Section Challenges
 * All resources in terraform were did merge with the links in links Sections
 * All details can be found over ./terraform/
 * Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
-* Lambda using Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only a GET method GET method
+* Lambda using JVM/Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only a GET method GET method
 * Lambda using Node.js, API Gateway and DynamoDb over Terraform IaC, with only a GET method
 ****
 
@@ -464,18 +478,16 @@ image::content/pic/LAMBDA_NodeJS_XRay_Enabled.png[X-Ray Enabled Lambda using Nod
 
 * Based on Resources *_todos_*, *_todos/{id}_*
 * Actions - HTTPS Methods - GET, PUT, POST, DELETE
-* API Gateway can *_publish,maintain,monitor,and secure APIs at any scale_*, supports HTTP(s) and WebSockets
-(two way communication - chat apps and streams dashboards)
+* API Gateway can *_publish,maintain,monitor,and secure APIs at any scale_*, supports HTTP(s) and WebSockets (two way communication - chat apps and streams dashboards)
 
 image::content/pic/API_GATEWAY_Approaches.png[]
 
-* We can customize all lifecylcle in gateway, [Method Request (Auth, Header, etc) - Integration Request,
-Integration Response Method Response]
+* We can customize all lifecylcle in gateway, [Method Request (Auth, Header, etc) - Integration Request, Integration Response Method Response]
 
 .Sample of Response integration Screen in AWS API Gateway
 image::content/pic/API_GATEWAY_Integration_Response.png[]
 
-[source, hcl-terraform]
+[source,hcl-terraform]
 ----
 # Sample of Response integration Screen in AWS API Gateway using Terraform
 ----
@@ -503,3 +515,54 @@ image::content/pic/API_GATEWAY_PreDefined_Responses.png[]
 image::content/pic/API_GATEWAY_Deploy_Stage.png[]
 
 * HTTP API - API Gateway
+
+.Snippet of Apache Camel and Quarkus Integration with DynamoDb
+[source,java]
+----
+@NoArgsConstructor
+@ApplicationScoped
+public class MyRouter extends RouteBuilder {
+
+  @Inject
+  DynamoDbClient dbClient;
+
+  @Override
+  public void configure() {
+
+    from("timer://myTimer?period=10s&fixedRate=true")
+            .process(e -> {
+              var key = new HashMap();
+              key.put("Language", AttributeValue.builder().s("Java").build());
+              e.getIn().setHeader(Ddb2Constants.KEY, key);
+              //e.getIn().setHeader(Ddb2Constants.ATTRIBUTE_NAMES, key.keySet()); // comment to return all attributes table
+            })
+            .to("aws2-ddb://LanguageStatistic-table?operation=getItem")
+            /*.process(e-> {
+
+                var response =  (Map<String, AttributeValue>) e.getIn().getHeader(Ddb2Constants.ATTRIBUTES);
+                e.getIn().setBody(response);
+
+            })*/
+            .to("bean:myBean")
+            //.convertBodyTo(String.class)
+            .log("${body}");
+  }
+}
+
+@Named
+@NoArgsConstructor
+@ApplicationScoped
+@RegisterForReflection
+public class MyBean {
+
+  @Handler
+  public MyDto fromMyDto(final @Header(Ddb2Constants.ATTRIBUTES) Map<String, AttributeValue> myDynamoDbHeader) {
+    var score = myDynamoDbHeader.get("Score").n();
+    var language = myDynamoDbHeader.get("Language").s();
+    return new MyDto(score, language);
+  }
+
+}
+
+
+----
