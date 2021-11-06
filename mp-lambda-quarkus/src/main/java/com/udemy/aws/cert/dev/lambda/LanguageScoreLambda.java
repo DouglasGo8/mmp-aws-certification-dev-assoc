@@ -6,7 +6,6 @@ import com.udemy.aws.cert.dev.lambda.domain.Language;
 import com.udemy.aws.cert.dev.lambda.dto.LanguageScoreDto;
 import org.apache.camel.ProducerTemplate;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -21,6 +20,7 @@ public class LanguageScoreLambda implements RequestHandler<Language, LanguageSco
 
   @Override
   public LanguageScoreDto handleRequest(Language input, Context context) {
-    return template.requestBody("{{language.score.direct.endpoint}}", input, LanguageScoreDto.class);
+    System.out.println("#Template isNull ===> " + (null == template)); // true
+    return new LanguageScoreDto("5", input.getLanguage());
   }
 }
