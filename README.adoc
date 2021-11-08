@@ -468,6 +468,26 @@ exports.handler = async (event) => {
 }
 ----
 
+IMPORTANT: *_AWS Lambda with Camel Quarkus and Terraform_*
+
+* When we are using Terraform to deploy your function.zip file to lambda structure the handler *MUST BE* ##io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest## as Terraform Snippet bellow
+
+[source, hcl-terraform]
+----
+resource "aws_lambda_function" "hello_lambda" {
+  function_name    = var.AWS_LAMBDA_FUNCTION_NAME
+  filename         = "${path.module}/function.zip"
+  role             = aws_iam_role.hello_lambda_role.arn
+  depends_on       = [aws_cloudwatch_log_group.hello_lambda_logging]
+  runtime          = "java11"
+  handler          = var.AWS_LAMBDA_HANDLER # pay attention here!!!
+}
+
+variable "AWS_LAMBDA_HANDLER" {
+  default = "io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest"
+}
+----
+
 .First Execution Lambda using Node.js v12.x
 image::content/pic/LAMBA_NodeJS_FirstExecution_Info.png[First Execution Lambda using Node.js v12.x]
 

@@ -11,5 +11,5 @@ variable "AWS_LAMBDA_FUNCTION_NAME" {
 }
 
 variable "AWS_LAMBDA_HANDLER" {
-  default = "com.udemy.aws.cert.dev.lambda.LanguageScoreLambda"
+  default = "io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest"
 }

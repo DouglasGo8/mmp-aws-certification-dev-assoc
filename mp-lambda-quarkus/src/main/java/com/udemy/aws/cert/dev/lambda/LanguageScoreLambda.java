@@ -15,12 +15,12 @@ import javax.inject.Named;
 @Named("languageScoreLambda")
 public class LanguageScoreLambda implements RequestHandler<Language, LanguageScoreDto> {
 
+
   @Inject
-  ProducerTemplate template;
+  ProducerTemplate producerTemplate;
 
   @Override
   public LanguageScoreDto handleRequest(Language input, Context context) {
-    System.out.println("#Template isNull ===> " + (null == template)); // true
-    return new LanguageScoreDto("5", input.getLanguage());
+    return this.producerTemplate.requestBody("{{language.score.direct.endpoint}}", input, LanguageScoreDto.class);
   }
 }
