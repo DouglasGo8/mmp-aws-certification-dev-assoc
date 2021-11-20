@@ -8,14 +8,12 @@ import lombok.Getter;
  */
 @Getter
 public class LanguageScoreDto {
-  private  String score;
-  private  String language;
+  private final String score;
+  private final String language;
 
-  public LanguageScoreDto(String score, String language)
-  {
+  public LanguageScoreDto(String score, String language) {
     this.score = score;
     this.language = language;
   }
-
-
+  
 }

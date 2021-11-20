@@ -21,6 +21,13 @@ public class LanguageScoreLambda implements RequestHandler<Language, LanguageSco
 
   @Override
   public LanguageScoreDto handleRequest(Language input, Context context) {
-    return this.producerTemplate.requestBody("{{language.score.direct.endpoint}}", input, LanguageScoreDto.class);
+
+    var logger = context.getLogger();
+
+    logger.log("handleRequest the Main Function");
+    logger.log(context.toString());
+
+    return this.producerTemplate.requestBody("{{language.score.direct.endpoint}}",
+            input, LanguageScoreDto.class);
   }
 }

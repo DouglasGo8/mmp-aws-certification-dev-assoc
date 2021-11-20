@@ -46,7 +46,7 @@ docker push {{AWS_ACCOUNT_ID}}.dkr.ecr.sa-east-1.amazonaws.com/aws-dev-repo:myap
 
 == AWS ECR Login output
 
-* The ##*_aws ecr get-login.._*## up command will genenerate the following message
+* The ##*_aws ecr get-login.._*## up command will generate the following message
 
 [source,html]
 ----
@@ -65,7 +65,7 @@ Login Succeeded
 - Avoiding "Undifferentiated heavy lifting"
 - AWS provides most of 200+ services
 
-NOTE: All links used as ref in this course and challenges
+NOTE: All links used as ref during this course and challenges
 
 - https://aws.amazon.com/[AWS Cloud]
 - https://{{YOUR_IAM_ID}}.signin.aws.amazon.com/console[IAM User AWS Console]
@@ -83,24 +83,22 @@ NOTE: All links used as ref in this course and challenges
 - https://github.com/DouglasGo8/terraform-udemy/tree/master/section-8[ECS EC2 Autoscaling]
 - https://hands-on.cloud/terraform-recipe-managing-auto-scaling-groups-and-load-balancers/[Managing Auto Scaling Groups & Load Balancers]
 - https://github.com/DouglasGo8/aws-cert-dev-udemy/blob/master/section04-asg:asg/autosale/main.tf[AWS Cert Dev]
-- https://github.com/Einsteinish/Terraform-Turotials/tree/master/Docker-Nginx-ALB-3-Containers-in-Private-Subnets-with-Dynamic-ASG[Ngix with ASG]
-
+- https://github.com/Einsteinish/Terraform-Turotials/tree/master/Docker-Nginx-ALB-3-Containers-in-Private-Subnets-with-Dynamic-ASG[Nginx with ASG]
+- https://quarkus.io/guides/writing-native-applications-tips[Tips for writing native applications ]
 - https://quarkus.io/guides/amazon-lambda-http[AWS Lambda with RestEasy, Undertow or Vert.x Web]
-- https://aws.amazon.com/pt/blogs/aws-brasil/integracao-do-aws-lambda-com-o-quarkus/
+- https://aws.amazon.com/pt/blogs/aws-brasil/integracao-do-aws-lambda-com-o-quarkus/[Integração do AWS Lambda com o Quarkus]
 - https://www.youtube.com/watch?v=geio38-zAdI[Quarkus #47: AWS Lambda]
 - https://how-to.vertx.io/aws-native-image-lambda-howto/[AWS Native Image Lambda HowTo]
 - https://docs.aws.amazon.com/lambda/latest/dg/lambda-java.html[Building Lambda functions with Java]
-
-- https://sysgears.com/articles/moving-lambda-function-from-serverless-to-terraform/
-- https://medium.com/@pra4mesh/aws-lambda-in-java-and-terraform-544da9102e37
-
-- https://adamtheautomator.com/terraform-aws-lambda/
-
-- https://github.com/nasa/cumulus/blob/master/example/cumulus-tf/lambdas.tf
-
+- https://sysgears.com/articles/moving-lambda-function-from-serverless-to-terraform/[Moving Lambda function from Serverless to Terraform]
+- https://medium.com/@pra4mesh/aws-lambda-in-java-and-terraform-544da9102e37[AWS Lambda in Java and Terraform]
+- https://adamtheautomator.com/terraform-aws-lambda/[Terraform and AWS Lambda? Yep. You Can do that.]
+- https://github.com/nasa/cumulus/blob/master/example/cumulus-tf/lambdas.tf[Git Cumulus Terraform Lambda Code]
 - https://camel.apache.org/components/3.12.x/aws2-ddb-component.html[AWS 2 DYNAMODB Apache Camel]
+- https://medium.com/swlh/deploy-aws-lambda-and-dynamodb-using-terraform-6e04f62a3165[Deploy AWS Lambda and DynamoDB Using Terraform]
+- https://www.youtube.com/watch?v=28Da0l0MFms[AWS Lambda: Java (Corretto 11) vs. JavaScript]
+- https://filia-aleks.medium.com/aws-lambda-battle-2021-performance-comparison-for-all-languages-c1b441005fd1[AWS Lambda battle 2021: performance comparison for all languages (cold and warm start)]
 
-- https://medium.com/swlh/deploy-aws-lambda-and-dynamodb-using-terraform-6e04f62a3165
 
 TIP: All tips to find possible issues in IaC scripts
 
@@ -113,8 +111,8 @@ IMPORTANT: Section Challenges
 * All resources in terraform were did merge with the links in links Sections
 * All details can be found over ./terraform/
 * Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
-* Lambda using JVM/Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only a GET method GET method
-* Lambda using Node.js, API Gateway and DynamoDb over Terraform IaC, with only a GET method
+* Lambda using JVM/Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC,
+with only a GET method
 ****
 
 == IAM Section
@@ -231,7 +229,7 @@ image::content/pic/EC2_important_Scenarios_pt2.png[]
 * Auto scales to handle huge loads, it can be *PUBLIC* or *PRIVATE*
 * Health checks to check route traffic to healthy instances
 
-Classifing Transport Layers::
+Classifying Transport Layers::
 
 Network Layer:::
 . IP (Internet Protocol) - Transfer Bytes, unreliable
@@ -436,28 +434,35 @@ resource "aws_lb_target_group" "alb-tg-nginx" {
 
 == Serverless Architecture Pt1
 
-IMPORTANT: Serverless *does NOT means* "No Servers"
+IMPORTANT: Serverless *does NOT mean* "No Servers"
 
 * Serverless means - No worry about Infrastructure, flexible scaling, automated high available, pay for use
 * With Serverless you can keep focus over the code
 * Some kind serverless Apps in AWS - Fargate, Lambda, API Gateway, Cognito, DynamoDB
 
-=== AWS Lambda
+=== AWS Serverless Lambda
 
 * Run your code without thinking about Servers, (but stay locked in AWS =) full vendor control)
 * AWS Lambda is the most popular choice in AWS, only about worry your code
-* Pay of number of requests, duration of requests and Memory
-* As a good practice is enable X-Ray Traces
-* To ensure that a critical lambda needs always run we need specify a reserved concurrency, e.g We can reseserved up to 900 nstances to a specific lambda
-* Lambda execution needs of a temporary runtime env, lambdas tries to reuse the execution context when possible, in the same execution context, object declares outside of hanlder remain initialized e.g DynamoDb
+* ##Pay of number of requests, duration of requests and Memory##
+* As a good practice is enabled X-Ray Traces
+* To ensure that a critical lambda needs always run we need specify a reserved concurrency, e.g We can reserve up to 900 Instances to a specific lambda
+* Lambda execution needs of a temporary runtime env, lambdas tries to reuse the execution context when possible, in the same execution context, object declares outside handler remain initialized, e.g Dynamodb
 * AWS reserve /tmp with 512mb disk space as caching to be reused across invocations
-* Cold start is a common problem for the first request to a lambda function is is tied to the first request, to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario we have a more expensive service
-* In Provisionde with reserved concurrency scenario, more instancens can coming than is allowed *_throttling_* concept can be applied, and the request will recieve 429 status code
-* Lambda can be invoked in both Sync/Async scenarios, in sync we have AWS API Gateway, CloudFront and Lex, to Async we have no wait for responses in aws services, we can Invoke as Task startTask over EC2 and runTask in a EC2/ECS service, we can sendo a SQS/SNS message when some event happens in S3, when a successful execution is done an invocation Record can be sent other message to SQS/SNS or another lambda function, but in case of fails there is a configuration options to async ops with retry, dlq and max age of event options
+* Cold start is a common problem for the first request to a lambda function  is tied to the first request, to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario we have a ##more expensive service##
+* In Provisioned with reserved concurrency scenario, more instances can come than is allowed *_throttling_* concept can be applied, and the request will receive 429 status code
+* Lambda can be invoked in both Sync/Async scenarios, in sync we have AWS API Gateway, CloudFront and Lex, to Async we have no wait for responses in aws services, we can Invoke as Task startTask over EC2 and runTask in a EC2/ECS service, we can send a SQS/SNS message when some event happens in S3, when a successful execution is done an invocation Record can be sent other message to SQS/SNS or another lambda function, but in case of fails there is a configuration options to async ops with retry, dlq and max age of event options
 * A Lambda@Edge location (Cloudfront) can be used to invoke the lambda function, but have a restriction and can be used just with to Python or Node.js (Javascript)
 * Alias can pointer to a specific version of lambda
 * Lambda code is typically dependent on other libraries, using layers we can share libs among lambdas and the *size* of lambda can be reduced
-* Sum up as best practices to use lambda we have, take advantage of *exection context reuse* to improve performance, initialize SDK clients and database connections outside of function handler, cache static assets locally in the /tmp dir *env variables* to pass operation parameters, *minimize your deploy package size as small possible*, avoid recursive code
+* Sum up as best practices to use lambda we have, take advantage of *execution context reuse* to improve performance, initialize SDK clients and database connections outside of function handler, cache static assets locally in the /tmp dir *env variables* to pass operation parameters, *minimize your deployment package size as small possible*, avoid recursive code
+* Summary and tips for AWS Lambda
+
+.Tips to Questions 1
+image::content/pic/AWS_LAMBDA_Scenario_Question_01.png[Scenario Questions 1]
+
+.Tips to Questions 2
+image::content/pic/AWS_LAMBDA_Scenario_Question_02.png[Scenario Questions 2]
 
 [source,javascript]
 ----
@@ -468,7 +473,7 @@ exports.handler = async (event) => {
 }
 ----
 
-IMPORTANT: *_AWS Lambda with Camel Quarkus and Terraform_*
+IMPORTANT: *_Note when using AWS Lambda with Camel Quarkus and Terraform_*
 
 * When we are using Terraform to deploy your function.zip file to lambda structure the handler *MUST BE* ##io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest## as Terraform Snippet bellow
 
@@ -489,7 +494,7 @@ variable "AWS_LAMBDA_HANDLER" {
 ----
 
 .First Execution Lambda using Node.js v12.x
-image::content/pic/LAMBA_NodeJS_FirstExecution_Info.png[First Execution Lambda using Node.js v12.x]
+image::content/pic/LAMBDA_NodeJS_FirstExecution_Info.png[First Execution Lambda using Node.js v12.x]
 
 .X-Ray Enabled Lambda using Node.js v12.x
 image::content/pic/LAMBDA_NodeJS_XRay_Enabled.png[X-Ray Enabled Lambda using Node.js v12.x]
@@ -502,7 +507,7 @@ image::content/pic/LAMBDA_NodeJS_XRay_Enabled.png[X-Ray Enabled Lambda using Nod
 
 image::content/pic/API_GATEWAY_Approaches.png[]
 
-* We can customize all lifecylcle in gateway, [Method Request (Auth, Header, etc) - Integration Request, Integration Response Method Response]
+* We can customize all lifecycle in gateway, [Method Request (Auth, Header, etc.) - Integration Request, Integration Response Method Response]
 
 .Sample of Response integration Screen in AWS API Gateway
 image::content/pic/API_GATEWAY_Integration_Response.png[]
@@ -517,10 +522,10 @@ image::content/pic/API_GATEWAY_Lambda_Integration.png[]
 
 * With mapping templates we can customize all Requests sent to Lambdas using ##Method Request passthrough##
 
-.Sample of Template "`Method Request passthrough`"
+.Sample of Template "`Method Request passthroughs`"
 image::content/pic/API_GATEWAY_Mapping_Template_RequestPassthrough.png[]
 
-.Sample of Event details using Method Request passthrough over Lambda Function
+.Sample of Event details using Method Request passthroughs over Lambda Function
 image::content/pic/API_GATEWAY_EventDetail_MappingTemplate_Request_passthrough.png[]
 
 * JSON Schema validation https://json-schema.org/learn/getting-started-step-by-step.html[JSON Schema Validation]
@@ -583,6 +588,28 @@ public class MyBean {
   }
 
 }
-
-
 ----
+
+.Snippet of Terraform Custom Runtime AWS Lambda
+[source, hcl-terraform]
+----
+resource "aws_lambda_function" "hello_lambda" {
+  function_name    = var.AWS_LAMBDA_FUNCTION_NAME
+  filename         = "${path.module}/function.zip"
+  role             = aws_iam_role.hello_lambda_role.arn
+  depends_on       = [aws_cloudwatch_log_group.hello_lambda_logging]
+  runtime          = "provided" // Native execution using Java + GraalVM
+  handler          = var.AWS_LAMBDA_HANDLER
+  memory_size      = 128 // Native execution using Java + GraalVM
+  source_code_hash = base64sha256("${path.module}/../../mp-lambda-quarkus/target/function.zip")
+}
+----
+
+.AWS Lambda First Execution using Java Zulu OpenJDK 17 (Quarkus/Apache Camel/Dynamodb)
+image::content/pic/AWS_Zulu_JDK_Lambda_FIrst_Processing.png[First AWS Lambda Execution Using Java JDK 17]
+
+.AWS Lambda First Execution using GraalVM
+image::content/pic/AWS_Lambda_GraalVM_Native_FIrst_Processing.png[First AWS Lambda Execution Using GraalVM Native Execution and Custom Runtime]
+
+.AWS Lambda Nth Execution using GraalVM
+image::content/pic/AWS_Lambda_GraalVM_Native_Nth_Processing.png[Nth AWS Lambda Execution Using GraalVM Native Execution and Custom Runtime]

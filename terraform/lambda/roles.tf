@@ -4,7 +4,6 @@ resource "aws_iam_role" "hello_lambda_role" {
   tags               = {
     STAGE = "hello-lambda-dev"
   }
-
 }
 
 resource "aws_cloudwatch_log_group" "hello_lambda_logging" {
@@ -14,5 +13,11 @@ resource "aws_cloudwatch_log_group" "hello_lambda_logging" {
 resource "aws_iam_role_policy" "hello_lambda_cloudwatch_policy" {
   name   = "hello-lambda-dev-cloudwatch-policy"
   policy = data.aws_iam_policy_document.cloudwatch_role_policy_document.json
+  role   = aws_iam_role.hello_lambda_role.id
+}
+
+resource "aws_iam_role_policy" "dynamodb_LanguageScore-table" {
+  name   = "dynamodb_LanguageScore-table"
+  policy = data.aws_iam_policy_document.dynamodb_LanguageScore-table_policy.json
   role   = aws_iam_role.hello_lambda_role.id
 }
