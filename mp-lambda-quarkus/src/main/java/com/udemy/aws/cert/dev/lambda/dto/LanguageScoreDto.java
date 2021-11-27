@@ -15,5 +15,12 @@ public class LanguageScoreDto {
     this.score = score;
     this.language = language;
   }
-  
+
+  @Override
+  public String toString() {
+    return "{" +
+            "score='" + score + '\'' +
+            ", language='" + language + '\'' +
+            '}';
+  }
 }

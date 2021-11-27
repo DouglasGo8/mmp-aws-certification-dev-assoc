@@ -91,7 +91,7 @@ NOTE: All links used as ref during this course and challenges
 - https://how-to.vertx.io/aws-native-image-lambda-howto/[AWS Native Image Lambda HowTo]
 - https://docs.aws.amazon.com/lambda/latest/dg/lambda-java.html[Building Lambda functions with Java]
 - https://sysgears.com/articles/moving-lambda-function-from-serverless-to-terraform/[Moving Lambda function from Serverless to Terraform]
-- https://medium.com/@pra4mesh/aws-lambda-in-java-and-terraform-544da9102e37[AWS Lambda in Java and Terraform]
+#-# https://medium.com/@pra4mesh/aws-lambda-in-java-and-terraform-544da9102e37[AWS Lambda in Java and Terraform]
 - https://adamtheautomator.com/terraform-aws-lambda/[Terraform and AWS Lambda? Yep. You Can do that.]
 - https://github.com/nasa/cumulus/blob/master/example/cumulus-tf/lambdas.tf[Git Cumulus Terraform Lambda Code]
 - https://camel.apache.org/components/3.12.x/aws2-ddb-component.html[AWS 2 DYNAMODB Apache Camel]

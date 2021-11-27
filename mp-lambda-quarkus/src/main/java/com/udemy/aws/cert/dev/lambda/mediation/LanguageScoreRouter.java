@@ -13,8 +13,8 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class LanguageScoreRouter extends RouteBuilder {
 
-  //@Inject
-  //DynamoDbClient dbClient;
+  // @Inject
+  // DynamoDbClient dbClient;
 
   @Override
   public void configure() throws Exception {

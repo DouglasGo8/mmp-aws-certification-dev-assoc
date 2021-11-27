@@ -30,19 +30,19 @@ public class LanguageScoreBean {
 
 
   @Handler
-  public LanguageScoreDto fromMyDto(final @Body Language language) {
+  public String fromMyDto(final @Body Language language) {
     // var score = header.get("Score").n();
     // var language = header.get("Language").s();
 
     switch (language.getLanguage().toLowerCase(Locale.ROOT)) {
       case "java":
-        return new LanguageScoreDto("5", language.getLanguage());
+        return new LanguageScoreDto("5", language.getLanguage()).toString();
       case "python":
-        return new LanguageScoreDto("3", language.getLanguage());
+        return new LanguageScoreDto("3", language.getLanguage()).toString();
       case "javascript":
-        return new LanguageScoreDto("4", language.getLanguage());
+        return new LanguageScoreDto("4", language.getLanguage()).toString();
       default:
-        return new LanguageScoreDto("-1", language.getLanguage());
+        return new LanguageScoreDto("-1", language.getLanguage()).toString();
     }
   }
 }
