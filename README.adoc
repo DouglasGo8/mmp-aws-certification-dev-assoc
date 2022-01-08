@@ -99,7 +99,6 @@ NOTE: All links used as ref during this course and challenges
 - https://www.youtube.com/watch?v=28Da0l0MFms[AWS Lambda: Java (Corretto 11) vs. JavaScript]
 - https://filia-aleks.medium.com/aws-lambda-battle-2021-performance-comparison-for-all-languages-c1b441005fd1[AWS Lambda battle 2021: performance comparison for all languages (cold and warm start)]
 
-
 TIP: All tips to find possible issues in IaC scripts
 
 * All public subnets must have the property *_map_public_ip_on_launch_* as true
@@ -111,8 +110,7 @@ IMPORTANT: Section Challenges
 * All resources in terraform were did merge with the links in links Sections
 * All details can be found over ./terraform/
 * Application Load Balance over ASG EC2 (No AMI Custom) in ECR with NGINX Reactjs Container
-* Lambda using JVM/Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC,
-with only a GET method
+* Lambda using JVM/Native Image (GraalVM) with Quarkus/Apache Camel, API Gateway and DynamoDb over Terraform IaC, with only a GET method
 ****
 
 == IAM Section
@@ -449,7 +447,7 @@ IMPORTANT: Serverless *does NOT mean* "No Servers"
 * To ensure that a critical lambda needs always run we need specify a reserved concurrency, e.g We can reserve up to 900 Instances to a specific lambda
 * Lambda execution needs of a temporary runtime env, lambdas tries to reuse the execution context when possible, in the same execution context, object declares outside handler remain initialized, e.g Dynamodb
 * AWS reserve /tmp with 512mb disk space as caching to be reused across invocations
-* Cold start is a common problem for the first request to a lambda function  is tied to the first request, to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario we have a ##more expensive service##
+* Cold start is a common problem for the first request to a lambda function is tied to the first request, to guarantee a consistent performance from lambda function we can use *_Provisioned Concurrency_*, but in this scenario we have a ##more expensive service##
 * In Provisioned with reserved concurrency scenario, more instances can come than is allowed *_throttling_* concept can be applied, and the request will receive 429 status code
 * Lambda can be invoked in both Sync/Async scenarios, in sync we have AWS API Gateway, CloudFront and Lex, to Async we have no wait for responses in aws services, we can Invoke as Task startTask over EC2 and runTask in a EC2/ECS service, we can send a SQS/SNS message when some event happens in S3, when a successful execution is done an invocation Record can be sent other message to SQS/SNS or another lambda function, but in case of fails there is a configuration options to async ops with retry, dlq and max age of event options
 * A Lambda@Edge location (Cloudfront) can be used to invoke the lambda function, but have a restriction and can be used just with to Python or Node.js (Javascript)
@@ -477,7 +475,7 @@ IMPORTANT: *_Note when using AWS Lambda with Camel Quarkus and Terraform_*
 
 * When we are using Terraform to deploy your function.zip file to lambda structure the handler *MUST BE* ##io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest## as Terraform Snippet bellow
 
-[source, hcl-terraform]
+[source,hcl-terraform]
 ----
 resource "aws_lambda_function" "hello_lambda" {
   function_name    = var.AWS_LAMBDA_FUNCTION_NAME
@@ -503,7 +501,13 @@ image::content/pic/LAMBDA_NodeJS_XRay_Enabled.png[X-Ray Enabled Lambda using Nod
 
 * Based on Resources *_todos_*, *_todos/{id}_*
 * Actions - HTTPS Methods - GET, PUT, POST, DELETE
-* API Gateway can *_publish,maintain,monitor,and secure APIs at any scale_*, supports HTTP(s) and WebSockets (two way communication - chat apps and streams dashboards)
+* API Gateway can *_publish,maintain,monitor,and secure APIs at any scale_*, supports HTTP(s) and WebSockets (two-way communication - chat apps and streams dashboards)
+* REST API
+** Fully Featured (API Caching, Request/Response Validation, Test Invocations)
+* HTTP API
+** Newer, Simple cheaper and Low latency
+** Automatic Deployments
+* Integration Request/Response in API Gateway can be used to apply transformations in all requests/responses
 
 image::content/pic/API_GATEWAY_Approaches.png[]
 
@@ -522,10 +526,10 @@ image::content/pic/API_GATEWAY_Lambda_Integration.png[]
 
 * With mapping templates we can customize all Requests sent to Lambdas using ##Method Request passthrough##
 
-.Sample of Template "`Method Request passthroughs`"
+.Sample of Template "`Method Request pass through`"
 image::content/pic/API_GATEWAY_Mapping_Template_RequestPassthrough.png[]
 
-.Sample of Event details using Method Request passthroughs over Lambda Function
+.Sample of Event details using Method Request pass through over Lambda Function
 image::content/pic/API_GATEWAY_EventDetail_MappingTemplate_Request_passthrough.png[]
 
 * JSON Schema validation https://json-schema.org/learn/getting-started-step-by-step.html[JSON Schema Validation]
@@ -591,7 +595,7 @@ public class MyBean {
 ----
 
 .Snippet of Terraform Custom Runtime AWS Lambda
-[source, hcl-terraform]
+[source,hcl-terraform]
 ----
 resource "aws_lambda_function" "hello_lambda" {
   function_name    = var.AWS_LAMBDA_FUNCTION_NAME
