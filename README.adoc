@@ -269,7 +269,7 @@ Network Layer (Layer 3) - IP
 ** Target Groups
 . We can group instances to alb have distributed the load, can be a set of EC2 instances, lambda function or a set of ip address
 ** Stickyness is a feat to send all request from one user to the same instance is implemented by using a cookie
-** Inbound Rules for SG can bind with the ALB security group to restrict http traffic as pic bello
+** Inbound Rules for SG can bind with the ALB security group to restrict http traffic as pic bellow
 
 image::content/pic/ALB_SG_RESTRICT_AND_BIND.png[]
 
@@ -639,3 +639,17 @@ image::content/pic/AWS_Lambda_GraalVM_Native_FIrst_Processing.png[First AWS Lamb
 
 .AWS Lambda Nth Execution using GraalVM
 image::content/pic/AWS_Lambda_GraalVM_Native_Nth_Processing.png[Nth AWS Lambda Execution Using GraalVM Native Execution and Custom Runtime]
+
+=== Identity Federation (AWS Cognito)
+
+. What is? Authentication users with an external authentication system and provide them access to resources on the cloud
+.. Corporate Identity - Federate with a Enterprise Auth System
+... SAML (XML Based) is the most popular protocol
+.. Web Identity Federation
+... Provide access to your application to users based on their Social IDs
+... OpenID (Supported by Facebook etc.) is the most popular protocol
+.. With cognito we can quickly add a sign-up page and authentication for mobile and web apps, we can also integrate with web identity providers such Google, Facebook etc
+.. Cognito is based in Identity Pools such Users Pools to create own secure scalable user dirs, sign-up or registration pages, customizable web ui to sign users, Cognito User Pool can be integrated with Api Gateway and Application Load Balancer
+
+.Cognito Users Pool vs Identity Pool
+image::content/pic/CogntoPoolsVsIdentityPools.png[]
