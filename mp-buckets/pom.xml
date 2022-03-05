@@ -11,35 +11,21 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-
-  <groupId>com.udemy.aws.cert.dev.assoc.lambda</groupId>
-  <artifactId>mp-lambda-quarkus</artifactId>
+  <groupId>com.udemy.aws.cert.dev.assoc.bucket</groupId>
+  <artifactId>mp-buckets</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
-  <name>AWS :: Developer Associate Certification 2021 :: Quarkus/Camel AWS Lambda</name>
-
+  <name>AWS :: Developer Associate Certification 2021 :: Quarkus/Camel AWS S3 Buckets</name>
 
   <dependencies>
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-amazon-lambda</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-lambda-java-events</artifactId>
-    </dependency>
-    <!--<dependency>
       <groupId>org.apache.camel.quarkus</groupId>
-      <artifactId>camel-quarkus-aws2-ddb</artifactId>
+      <artifactId>camel-quarkus-aws2-s3</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-amazon-dynamodb</artifactId>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-timer</artifactId>
     </dependency>
-    <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>url-connection-client</artifactId>
-    </dependency>-->
   </dependencies>
 
   <build>
@@ -63,7 +49,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${compiler-plugin.version}</version>
         <configuration>
-          <parameters>${maven.compiler.parameters}</parameters>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>

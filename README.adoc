@@ -642,7 +642,8 @@ image::content/pic/AWS_Lambda_GraalVM_Native_Nth_Processing.png[Nth AWS Lambda E
 
 === Identity Federation (AWS Cognito)
 
-. What is? Authentication users with an external authentication system and provide them access to resources on the cloud
+. What is?
+Authentication users with an external authentication system and provide them access to resources on the cloud
 .. Corporate Identity - Federate with a Enterprise Auth System
 ... SAML (XML Based) is the most popular protocol
 .. Web Identity Federation
@@ -653,3 +654,14 @@ image::content/pic/AWS_Lambda_GraalVM_Native_Nth_Processing.png[Nth AWS Lambda E
 
 .Cognito Users Pool vs Identity Pool
 image::content/pic/CogntoPoolsVsIdentityPools.png[]
+
+=== S3 Fundamentals
+
+. Most popular very flexible & inexpensive storage service
+. Storage large object using key-value approach
+. Store all file types such as text, binary & archives
+. S3 is a *_Global Service_*, and we can't need choose a specific region, however a bucket is created in a specific AWS region
+. Bucket names are used as part of object URLs and just can contain ONLY lower case letters numbers hyphens and
+
+.Granting Read-Only Permission to Anonymous User Policy
+image::content/pic/s3_grating_readonly_permission.png[Policy to S3]
