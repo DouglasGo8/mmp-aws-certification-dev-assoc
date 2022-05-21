@@ -373,7 +373,7 @@ resource "aws_autoscaling_group" "nginx-asg" {
 }
 ----
 
-* Auto Scaling Components
+. Auto Scaling Components
 . Launch Configuration/Template as EC2 AMIS Customs sizes etc
 . Auto Scaling Group with min max size of this group and health checks
 . Auto Scaling policies when and how to execute scaling
@@ -731,10 +731,18 @@ resource "aws_iam_group_policy" "developer_policy" {
       {
         Action = [
           "ec2:Describe*",
+          "s3:ListAllMyBuckets"
         ]
         Effect   = "Allow"
         Resource = "*"
       },
+      {
+        Action = [
+          "elasticloadbalancing:*"
+        ]
+        Effect = "Allow"
+        Resource = "*"
+      }
     ]
   })
 }
@@ -748,3 +756,23 @@ resource "aws_iam_policy_attachment" "test-attach" {
 }
 
 ----
+
+.IAM Scenarios
+image::content/pic/iam_scenarios.png[]
+
+. Cross Account Access based on differents Accounts PROD and DEV basend on trusted entities
+
+. Switch between Roles
+
+.IAM ROLE CROSS
+image::content/pic/IAM_ROLE_CROSS.png[]
+
+.IAM ROLE CROSS ADD ARNs
+image::content/pic/IAM_ROLE_CROSS_ADD_ARNs.png[]
+
+. IAM can have Corporate Directory Federation
+. Users - Create individual users
+. Groups - Manage permissions with groups
+. Permissions - Grant least privilege
+. Auditing - Tunn on AWS Cloudtrail
+. Pasword - Configure a strong password policy
