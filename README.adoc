@@ -644,7 +644,7 @@ image::content/pic/AWS_Lambda_GraalVM_Native_Nth_Processing.png[Nth AWS Lambda E
 
 . What is?
 Authentication users with an external authentication system and provide them access to resources on the cloud
-.. Corporate Identity - Federate with a Enterprise Auth System
+.. Corporate Identity - Federate with an Enterprise Auth System
 ... SAML (XML Based) is the most popular protocol
 .. Web Identity Federation
 ... Provide access to your application to users based on their Social IDs
@@ -662,6 +662,89 @@ image::content/pic/CogntoPoolsVsIdentityPools.png[]
 . Store all file types such as text, binary & archives
 . S3 is a *_Global Service_*, and we can't need choose a specific region, however a bucket is created in a specific AWS region
 . Bucket names are used as part of object URLs and just can contain ONLY lower case letters numbers hyphens and
+. Prefix allows us to search for keys starting with a certain prefix
 
 .Granting Read-Only Permission to Anonymous User Policy
 image::content/pic/s3_grating_readonly_permission.png[Policy to S3]
+
+==== S3 Storage Class
+
+. Different kinds of data can be stored in AWS S3 such as _Media,App packages and logs etc_
+. S3 Lifecycle configuration can be used to reduce cost, and can be classified as transition and expiration types
+
+.S3 Storage Classes
+image::content/pic/S3_Storage_Class.png[]
+
+=== Authentication and Authorization with IAM
+
+. Cloud is everything based on Resources and Identities e.g. vpn, database etc, humans and non-humans that need access those resources to perform actions
+. Identities can be AWS users or Federated uses, with very granular control
+
+
+- https://aws.amazon.com/blogs/security/easier-way-to-control-access-to-aws-regions-using-iam-policies/[Easier way to control access to AWS regions using IAM policies]
+- https://github.com/terraform-aws-modules/terraform-aws-iam/blob/12c846b6cf875c5d975742dcb249fc42b3f1a18a/modules/iam-user/main.tf[Iam User/Group Resources]
+
+[source,hcl-terraform]
+----
+resouce "aws_iam_access_key" {
+
+}
+
+resource "aws_iam_user" "user" {
+  name = "test-user"
+}
+
+resource "aws_iam_group" "developers" {
+  name = "developers"
+  path = "/users/"
+}
+
+resource "aws_iam_role" "role" {
+  name = "test-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_group_policy" "developer_policy" {
+  name  = "developer_policy"
+  group = aws_iam_group.developers.name
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:Describe*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "test-attach" {
+  name       = "test-attachment"
+  users      = [aws_iam_user.user.name]
+  roles      = [aws_iam_role.role.name]
+  groups     = [aws_iam_group.developers.name]
+  policy_arn = aws_iam_policy.aws_iam_group_policy.arn
+}
+
+----
