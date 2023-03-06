@@ -760,7 +760,7 @@ resource "aws_iam_policy_attachment" "test-attach" {
 .IAM Scenarios
 image::content/pic/iam_scenarios.png[]
 
-. Cross Account Access based on differents Accounts PROD and DEV basend on trusted entities
+. Cross Account Access based on different Accounts PROD and DEV based on trusted entities
 
 . Switch between Roles
 
@@ -774,5 +774,45 @@ image::content/pic/IAM_ROLE_CROSS_ADD_ARNs.png[]
 . Users - Create individual users
 . Groups - Manage permissions with groups
 . Permissions - Grant least privilege
-. Auditing - Tunn on AWS Cloudtrail
-. Pasword - Configure a strong password policy
+. Auditing - Turn on AWS Cloudtrail
+. Password - Configure a strong password policy
+
+=== AWS VPC
+
+. https://github.com/DouglasGo8/MMP-AWS-Ultimate-Certified-Solutions-Architect[VPC Details]
+
+=== AWS Databases
+
+. Database snapshots, taking copy of the database (take a snapshot) every hour to another data center
+. AWS RDS is responsible for Availability (according my configuration), durability, Scaling and maintenance
+. AWS is not responsible for user maintenance, app optimizations, we cannot do ssh into database ec2, or even install OS or DB patches
+
+=== AWS SAM
+
+. SAM is opensource framework for building serverless application
+. Define yaml file with resources (Functions, APIS, databases)
+. Behind the scenes SAM config CloudFormation scripts
+. Benefits SAM are: single deploy config, extends cloudformation, local debug and tests
+
+=== AWS KMS
+
+.KMS Intro Page
+image::content/pic/kms/kms_intro_page.png[]
+
+
+.KMS Keys Kinds
+image::content/pic/kms/kms_customer_keys_kindof_keys.png[]
+
+.KMS CLI Sample
+[source,bash]
+----
+aws kms encrypt --key-id alias/lambda-cipher --plaintext mysuperpassword \
+ --output text --query CiphertextBlob \
+ --region sa-east-1 > filesecretconent-encrypted.base64
+----
+
+.KMS Binary Version
+[source, bash]
+----
+cat MySecretContentFile.base64 | base64 --decode > MySecretContentFile
+----
