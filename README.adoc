@@ -812,7 +812,102 @@ aws kms encrypt --key-id alias/lambda-cipher --plaintext mysuperpassword \
 ----
 
 .KMS Binary Version
-[source, bash]
+[source,bash]
 ----
 cat MySecretContentFile.base64 | base64 --decode > MySecretContentFile
 ----
+
+== Step Function Orchestration with CQRS Pattern
+
+=== Requirements
+
+=== Tip
+
+=== Support
+
+=== AWS Step Function with Arsenal Photon and CQRS Pattern
+
+Link to Step Functions basic Concepts
+
+=== CQRS Concepts
+
+CQRS means _Command and Query Responsibility Segregation_, this is a *pattern* a architectural pattern, that separates read and write operations for a data store, one of main purpose of CQRS implementation is to maximize the performance of the application and to improve the scalability and security In other words, we can overload our systems with unnecessary responsibilities, e.g; the writer may implement complex validation and business logic, the reader side may implement complex queries
+
+==== CQRS as Solution
+
+Hooray CQRS is the bullet silver for all problems?
+Definitively NOT... but it can provide some solutions such:
+
+. Commands should be task-based, e.g; async insert, insert over topic/queue . Queries never modify data, query can return a DTO . We can use greater isolation, using databases physically isolated one for just for read other just for write, using materialized views to avoid Complex ORM Queries . An important concept in separation of the read and write stores also allows each to be scaled appropriately to match the load.
+For example, read stores typically encounter a much higher load than write stores, to summarize the benefits we have
+
+. Independent scaling: We all thinking about performance and scalability CQRS allows the read and write workloads to scale independently, and may result in fewer lock contentions.
+. Optimized data schemas: the read side can use a schema that is optimized for queries, while the write side uses a schema that is optimized for updates.
+. Security.
+It's easier to ensure that only the right domain entities are performing writes on the data.
+. Separation of concerns.
+Segregating the read and write sides can result in models that are more maintainable and flexible.
+Most of the complex business logic goes into the write model.
+The read model can be relatively simple.
+. Simpler queries.
+By storing a materialized view in the read database, the application can avoid complex joins when querying.
+
+...ok and about the Problems, ok our life is not too easy down some problems when using CQRS
+. Complexity: the basic idea of CQRS is simple, but it can lead to a more complex application design, especially if they include the Event Sourcing pattern.
+
+. Eventual consistency.
+If you separate the read and write databases, the read data may be stale.
+*PAY* really, really attention in stale data, the read model store must be updated to reflect changes to the write model store, and it can be difficult to detect when a user has issued a request based on stale read data.
+
+=== Kinds of Synchronizations
+
+Automatic update – Every data state change in the recording database triggers a synchronous process to update the reading database.
+Eventual update – Every change in the state of data in the recording database triggers an asynchronous process to update the reading database, offering eventual consistency of the data.
+Controlled update – A periodic and scheduled process is triggered to synchronize the databases.
+Update on demand – Each query checks the consistency of the read base against the write base and forces an update if it is out of date.
+
+In our sample we use Event Update
+
+=== When and how use it
+
+. Collaborative domains: Here we have many users access the same data but in parallel actions.
+CQRS allows you to define commands with enough granularity to minimize merge conflicts at the domain level, and conflicts that do arise can be merged by the command.
+
+. Task-based such user interfaces, orchestration (Step Functions), where users are guided through a complex process as a series of steps or with complex domain models (Not isolated in Functions), The write model has a full command-processing stack with business logic, input validation, and business validation and the read model has no business logic or validation stack, and just returns a DTO for use in a view model.
+The read model is eventually consistent with the write model.
+
+. Scenarios where performance of data reads must be fine-tuned separately from performance of data writes, especially when the number of reads is much greater than the number of writes.
+In this scenario, you can scale out the read model, but run the write model on just a few instances.
+A small number of write model instances also helps to minimize the occurrence of merge conflicts
+
+. Scenarios where one team of developers can focus on the complex domain model that is part of the write model, and another team can focus on the read model and the user interfaces
+
+. Scenarios where the system is expected to evolve over time and might contain multiple versions of the model, or where business rules change regularly.
+
+. Integration with other systems, especially in combination with event sourcing, where the temporal failure of one subsystem shouldn't affect the availability of the others.
+
+=== How To Step Function Arsenal Photon with CQRS Pattern
+
+To demonstrate a hypothetical case where CQRS pattern have a good match, we'll work in solution such demonstrated down bellow
+
+::pic excalidraw here::
+
+
+. Over the welcome page we'll choose the most appropriate case for our scenario
+
+
+image::content/pic/stepfunction/StepFunction_Intro_welcomePage_cqrs.png[]
+
+for our sample we'll use the payload as state input
+
+image::content/pic/stepfunction/Payload_staate_input.png[]
+
+
+After your create your state machine, more doutbs please check :: link giazi :: we can input the the payload and start our processing
+
+In first part of your execution
+
+
+
+https://www.eduardopires.net.br/2016/07/cqrs-o-que-e-onde-aplicar/
+https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs
