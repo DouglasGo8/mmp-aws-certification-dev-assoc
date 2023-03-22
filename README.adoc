@@ -900,10 +900,11 @@ image::content/pic/stepfunction/StepFunction_Intro_welcomePage_cqrs.png[]
 
 for our sample we'll use the payload as state input
 
-image::content/pic/stepfunction/Payload_staate_input.png[]
+image::content/pic/stepfun
+ction/Payload_staate_input.png[]
 
 
-After your create your state machine, more doutbs please check :: link giazi :: we can input the the payload and start our processing
+After your create your state machine, more doubts please check :: link StepFunction Concepts :: we can input the payload and start our processing
 
 In first part of your execution
 
@@ -911,3 +912,107 @@ In first part of your execution
 
 https://www.eduardopires.net.br/2016/07/cqrs-o-que-e-onde-aplicar/
 https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs
+
+
+{
+"offerInline": "1-sss-222"
+}
+
+
+
+== Review Content
+
+=== Amazon State Language & I/O Processing
+
+. ASL Basics
+.. State Machine Structure
+... Fields
+.... Comment
+.... StartAt
+.... TimeoutSeconds
+.... Version
+.... States
+... Execution Termination
+.... End
+.... Terminal States
+
+.. Intrinsic Functions
+.. Common State Fields
+.. In/Out Processing
+
+
+
+image::content/pic/stepfunction/basic_concept_option_field_definition.png[]
+
+if we needs access the TimeoutSeconds fiels we can use the jsonpath concept such
+
+[source, jsonpath]
+----
+{
+    "InputPath": "$.TimeoutSeconds",
+}
+----
+
+=== Input & Output Parameter
+
+.Input
+[source,json]
+----
+{
+  "name": "Pass",
+  "output": {
+    "lambdaResult": {
+      "ExecuteVersion": "34",
+      "Payload": {
+        "statusCode": 200,
+        "body": "Quote: Step Functions and Lambdas - event better"
+      }
+    }
+  }
+}
+----
+
+.State Handle
+[source, json]
+----
+{
+  "States": {
+      "input": {
+        "Type": "Pass",
+        "Parameters": {
+          "About": "Generic Info",
+          "Info": {
+              "status.$": "$.output.lambdaResult.Payload.statusCode",
+              "body.$": "$.output.lambdaResult.Payload.body"
+          }
+        }
+      },
+    "Wait": {
+      "Type": "Wait"
+    }
+  }
+}
+----
+
+.State Output
+[source, json]
+----
+{
+  "body": "Quote: Step Functions and Lambdas - event better",
+  "status": 200
+}
+----
+
+=== Result Selector
+[source, json]
+----
+{
+  "field.$": "$.Payload.value"
+}
+----
+
+== Data Flow Simulator
+Some screen shots
+
+
+in this case TimeoutSeconds needs match with the overall execution, otherwise we'll have  timeout exception, to avoid we can increase the value of property
